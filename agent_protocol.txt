@@ -1,0 +1,191 @@
+================================================================================
+  TIPBOARD — AGENT PROTOCOL
+  SPC26 · 2026 Season
+================================================================================
+
+Read this file in full before touching any code.
+
+--------------------------------------------------------------------------------
+  1. ORIENTATION
+--------------------------------------------------------------------------------
+
+Project:   TipBoard — retro arcade tipping competition tracker
+Spec:      c:\Coding Files\SPC26\spc26 project details.md
+App root:  c:\Coding Files\SPC26\app\
+Memory:    c:\Users\micha\.claude\projects\c--Coding-Files-SPC26\memory\MEMORY.md
+
+Read MEMORY.md first — it contains the current project state, completed work,
+architecture decisions, and file map. Do not duplicate what is already built.
+
+--------------------------------------------------------------------------------
+  2. YOUR ASSIGNMENT
+--------------------------------------------------------------------------------
+
+You will be given a single feature to build. Stay strictly within that scope.
+Do not refactor, rename, or "improve" anything outside your assigned files.
+
+Assigned feature folders by task:
+
+  A — Login page:       src/app/features/login/
+  B — Rounds grid:      src/app/features/rounds/
+  C — Admin pages:      src/app/features/admin/users/
+                        src/app/features/admin/bets/
+  D — Race page:        src/app/features/race/
+
+--------------------------------------------------------------------------------
+  3. FILES YOU MUST NOT TOUCH
+--------------------------------------------------------------------------------
+
+These are shared infrastructure. Leave them exactly as they are:
+
+  src/styles.css                          ← global theme tokens + animations
+  src/index.html                          ← fonts loaded here
+  src/app/app.ts                          ← shell component
+  src/app/app.html                        ← sidebar + router-outlet
+  src/app/app.scss                        ← sidebar + layout styles
+  src/app/app.routes.ts                   ← all routes already registered
+  src/app/app.config.ts                   ← providers
+  src/app/core/supabase.service.ts        ← all DB query methods live here
+  src/app/core/auth.service.ts            ← session state, signIn, signOut
+  src/app/core/auth.guard.ts              ← protects /admin/* routes
+  src/app/shared/models/                  ← User, Round, RoundScore, BetResult,
+                                             LeaderboardEntry interfaces
+  src/environments/                       ← credentials, do not modify
+
+If your feature genuinely requires a new shared query method, add it to
+supabase.service.ts only — do not duplicate queries inline in your component.
+
+--------------------------------------------------------------------------------
+  4. THEME — RETRO ARCADE (MANDATORY)
+--------------------------------------------------------------------------------
+
+Every page must match the existing visual language. Reference the dashboard
+(src/app/features/leaderboard/) as the canonical example.
+
+Colour tokens (use CSS variables — never hardcode hex values):
+
+  --color-bg        #06040F    page background
+  --color-card      #0D0A1A    card background
+  --color-card-2    #160E2B    elevated card / hover bg
+  --color-border    #2A1850    borders
+  --color-accent    #FF00A8    hot pink — primary CTA, active states
+  --color-cyan      #00F5FF    secondary accent
+  --color-win       #39FF14    neon green — wins, positive scores
+  --color-loss      #FF3B3B    loss red
+  --color-gold      #FFD700    1st place
+  --color-silver    #8A9BB0    2nd place
+  --color-bronze    #CD7F32    3rd place
+  --color-muted     #5A3E7A    muted text
+  --color-text      #D4C8F0    body text
+
+Typography:
+
+  'Press Start 2P'    — section headers, badges, labels (pixel font — use sparingly)
+  'Bebas Neue'        — large display text, player names, round numbers
+  'JetBrains Mono'    — scores, data, body text, all monospaced content
+
+Reusable CSS classes (defined in styles.css — use them):
+
+  .arcade-card        dark card with scanline overlay (::after pseudo-element)
+  .arcade-card-inner  z-index wrapper inside .arcade-card (put all content here)
+  .glow-pink          box-shadow glow using --color-accent
+  .glow-cyan          box-shadow glow using --color-cyan
+  .glow-green         box-shadow glow using --color-win
+  .btn-primary        hot pink CTA button with glow
+  .btn-ghost          muted bordered button
+  .score-positive     neon green text
+  .score-negative     loss red text
+  .score-null         muted text (render null gross as — never 0)
+  .pixel-label        tiny Press Start 2P label (add .blink for blinking state)
+
+Global keyframe animations (use these, do not redefine):
+
+  blink               1s step-end — blinking cursor / CTA text
+  glow-pulse          2s ease — pulsing glow on bonus badges
+  float-up            0.4s ease — page entry animation (use on root container)
+  flicker             8s — CRT screen flicker (used on brand name)
+
+Score display rules (from spec §11 — non-negotiable):
+
+  null gross          → render as — (em dash), class="score-null"
+  positive gross      → class="score-positive"
+  negative gross      → class="score-negative"
+  apply_multiplier    → show ⚡×2 badge on that cell/row
+
+--------------------------------------------------------------------------------
+  5. CODE STANDARDS
+--------------------------------------------------------------------------------
+
+Components:
+  - Angular 20 standalone components only (imports: [...] in @Component)
+  - Use @if / @for / @switch template syntax (not *ngIf / *ngFor)
+  - Use signal() and computed() for reactive state
+  - Load data in ngOnInit with async/await + try/catch/finally
+  - Always set loading = signal(true), error = signal<string|null>(null)
+  - Show a loading state while fetching and an error state if it fails
+
+Services:
+  - Inject SupabaseService and AuthService via constructor
+  - Call this.db.methodName() — never import the Supabase client directly
+
+Styles:
+  - Component-specific styles go in the component's .scss file
+  - Global/shared styles only go in src/styles.css (do not add to it)
+  - Use BEM naming: .block, .block__element, .block--modifier
+  - Use Tailwind utility classes for layout, spacing, flex, grid
+  - Use SCSS for hover transitions, animations, dynamic state, gradients
+  - Never hardcode colours — always use CSS custom properties
+
+--------------------------------------------------------------------------------
+  6. SUPABASE SERVICE — AVAILABLE METHODS
+--------------------------------------------------------------------------------
+
+Import: import { SupabaseService } from '../../core/supabase.service';
+
+  db.getLeaderboard()                          → Promise<LeaderboardEntry[]>
+  db.getRoundScores()                          → Promise<RoundScore[]>
+  db.getSchedule()                             → Promise<Round[]>
+  db.getNextRound()                            → Promise<Round | null>
+  db.getUsers()                                → Promise<User[]>
+  db.addUser(name: string)                     → Promise<void>
+  db.setUserActive(id: string, active: bool)   → Promise<void>
+  db.getBetResults(scheduleId?: string)        → Promise<BetResult[]>
+  db.upsertBetResult({ user_id, schedule_id,
+    gross, apply_multiplier })                 → Promise<void>
+  db.deleteBetResult(userId, scheduleId)       → Promise<void>
+
+For auth operations use AuthService:
+  auth.isAuthenticated                         → boolean (getter)
+  auth.session()                               → Session | null (signal)
+  auth.signIn(email, password)                 → Promise<AuthResponse>
+  auth.signOut()                               → Promise<void>
+
+--------------------------------------------------------------------------------
+  7. RESPONSIVE REQUIREMENTS
+--------------------------------------------------------------------------------
+
+Every page must work on both desktop monitor and mobile. Minimum breakpoints:
+
+  Mobile:   < 768px   — single column, larger tap targets, 16px page padding
+  Tablet:   768–1024px
+  Desktop:  > 1024px  — primary target, sidebar is visible
+
+The sidebar is 240px wide on desktop and hidden on mobile (topbar shown instead).
+Account for this in your layouts — do not assume full viewport width on desktop.
+
+--------------------------------------------------------------------------------
+  8. BEFORE YOU FINISH
+--------------------------------------------------------------------------------
+
+Run a production build and confirm zero errors:
+
+  cd "c:\Coding Files\SPC26\app"
+  ng build
+
+Fix all TypeScript errors and Angular compiler errors before declaring done.
+Warnings about budget size may be acceptable — errors are not.
+
+Do not commit. Do not push. Do not run ng serve.
+Report build result (errors/warnings count) when complete.
+
+================================================================================

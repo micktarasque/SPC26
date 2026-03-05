@@ -1,0 +1,148 @@
+<!-- Loading -->
+@if (loading()) {
+  <div class="state-screen">
+    <span class="pixel-title blink">LOADING...</span>
+  </div>
+}
+
+<!-- Error -->
+@if (error()) {
+  <div class="state-screen">
+    <span class="pixel-title error">⚠ ERROR</span>
+    <p class="state-msg">{{ error() }}</p>
+  </div>
+}
+
+<!-- Dashboard -->
+@if (!loading() && !error()) {
+<div class="dashboard">
+
+  <!-- ═══ WIDGET 1: NEXT STAGE BANNER ═══ -->
+  @if (nextRound()) {
+    <div class="next-stage arcade-card glow-pink">
+      <div class="arcade-card-inner">
+        <div class="next-stage__header">
+          <span class="pixel-label">INCOMING</span>
+          @if (nextRound()!.bonus_pct > 100) {
+            <span class="next-stage__bonus visible">⚡ BONUS ROUND ×2</span>
+          }
+        </div>
+        <div class="next-stage__body">
+          <div class="next-stage__round">
+            <span class="next-stage__round-num">ROUND {{ nextRound()!.round_number < 10 ? '0' + nextRound()!.round_number : nextRound()!.round_number }}</span>
+            <span class="next-stage__date">{{ formatDate(nextRound()!.round_date) }}</span>
+          </div>
+          <div class="next-stage__event">
+            @if (nextRound()!.sport === 'Races') { 🏇 }
+            @else if (nextRound()!.sport === 'Golf') { ⛳ }
+            @else if (nextRound()!.sport === 'NRL') { 🏉 }
+            @else if (nextRound()!.sport === 'Soccer') { ⚽ }
+            @else if (nextRound()!.sport === 'Cycling') { 🚴 }
+            @else if (nextRound()!.sport === 'E-Sports') { 🎮 }
+            @else if (nextRound()!.sport === 'Table Tennis') { 🏓 }
+            @else { 🎲 }
+            {{ nextRound()!.special_event ?? nextRound()!.sport ?? 'TBA' }}
+          </div>
+        </div>
+        <div class="next-stage__footer">
+          <span class="insert-coin">★ INSERT COIN TO PLAY ★</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ═══ BOTTOM ROW ═══ -->
+  <div class="bottom-row">
+
+    <!-- ═══ WIDGET 2: HIGH SCORES ═══ -->
+    <div class="high-scores arcade-card glow-cyan">
+      <div class="arcade-card-inner">
+        <div class="high-scores__header">
+          <span class="pixel-title">HIGH SCORES</span>
+          <span class="high-scores__season">SEASON 2026</span>
+        </div>
+
+        @if (players().length === 0) {
+          <div class="empty-state">
+            <span class="pixel-label blink">▶ NO PLAYERS YET</span>
+          </div>
+        } @else {
+          <div class="scores-list">
+            @for (p of players(); track p.user_id) {
+              <div class="score-row"
+                   [class.score-row--leader]="p.rank === 1"
+                   [class.score-row--danger]="p.rank === players().length && (p.total_net ?? 0) < 0">
+                <span class="score-rank" [attr.data-color]="rankColor(p.rank)">{{ rankLabel(p.rank) }}</span>
+                <span class="score-name">{{ p.name }}</span>
+                <span class="score-streak">
+                  @if (p.streak > 0) {
+                    @if (p.streakType === 'win') {
+                      @for (_ of repeat(p.streak); track $index) {🔥}
+                    } @else {
+                      @for (_ of repeat(p.streak); track $index) {❄️}
+                    }
+                  }
+                </span>
+                <span class="score-net"
+                      [class.score-net--pos]="(p.total_net ?? 0) > 0"
+                      [class.score-net--neg]="(p.total_net ?? 0) < 0"
+                      [class.score-net--null]="p.total_net === null">
+                  {{ formatNet(p.total_net) }}
+                </span>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="high-scores__footer">
+          <span class="pixel-label">▶ {{ completedRoundCount() }} ROUNDS PLAYED</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ WIDGET 3: SEASON TRACKER ═══ -->
+    <div class="season-tracker arcade-card glow-green">
+      <div class="arcade-card-inner">
+        <div class="season-tracker__header">
+          <span class="pixel-title">SEASON</span>
+          <span class="season-tracker__progress">{{ completedRoundCount() }} / {{ totalRounds }}</span>
+        </div>
+
+        <div class="season-tracker__subtitle">ROUNDS COMPLETE</div>
+
+        <div class="rounds-grid">
+          @for (r of rounds(); track r.number) {
+            <div class="round-pip" [class.round-pip--done]="r.done" [title]="'Round ' + r.number">
+              {{ r.done ? '●' : '○' }}
+            </div>
+          }
+        </div>
+
+        <div class="season-tracker__stats">
+          <div class="season-stat">
+            <span class="season-stat__label">PLAYERS</span>
+            <span class="season-stat__value cyan">{{ players().length || '—' }}</span>
+          </div>
+          <div class="season-stat">
+            <span class="season-stat__label">ROUNDS LEFT</span>
+            <span class="season-stat__value pink">{{ totalRounds - completedRoundCount() }}</span>
+          </div>
+          <div class="season-stat">
+            <span class="season-stat__label">LEADER</span>
+            <span class="season-stat__value gold">{{ players()[0]?.name ?? '—' }}</span>
+          </div>
+        </div>
+
+        <div class="season-tracker__footer">
+          @if (completedRoundCount() === 0) {
+            <span class="pixel-label blink">● SEASON NOT YET STARTED</span>
+          } @else {
+            <span class="pixel-label">● ROUND {{ completedRoundCount() }} COMPLETE</span>
+          }
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+}

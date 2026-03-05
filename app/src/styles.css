@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* ─── Retro Arcade Colour Tokens ──────────────────────────────────────────── */
+:root {
+  --color-bg:       #06040F;
+  --color-card:     #0D0A1A;
+  --color-card-2:   #160E2B;
+  --color-border:   #2A1850;
+  --color-accent:   #FF00A8;   /* hot magenta — primary arcade colour        */
+  --color-cyan:     #00F5FF;   /* electric cyan — secondary                  */
+  --color-win:      #39FF14;   /* neon green — wins                          */
+  --color-loss:     #FF3B3B;   /* loss red                                   */
+  --color-gold:     #FFD700;   /* 1st place                                  */
+  --color-silver:   #8A9BB0;   /* 2nd place                                  */
+  --color-bronze:   #CD7F32;   /* 3rd place                                  */
+  --color-muted:    #5A3E7A;
+  --color-text:     #D4C8F0;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+}
+
+/* ─── Shared Component Classes ───────────────────────────────────────────── */
+@layer components {
+
+  .btn-primary {
+    @apply px-4 py-2 rounded-lg font-semibold text-sm tracking-wide transition-all hover:opacity-90;
+    background: var(--color-accent);
+    color: #fff;
+    box-shadow: 0 0 16px rgba(255, 0, 168, 0.4);
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 rounded-lg text-sm transition-colors;
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
+  }
+
+  .stat-card {
+    @apply rounded-2xl p-6;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+  }
+
+  .score-positive { color: var(--color-win); }
+  .score-negative { color: var(--color-loss); }
+  .score-null     { color: var(--color-muted); }
+
+  /* Retro neon card */
+  .arcade-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+
+    /* Scanline overlay */
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.12) 2px,
+        rgba(0, 0, 0, 0.12) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+  }
+
+  .arcade-card-inner {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Glowing border accent */
+  .glow-pink  { box-shadow: 0 0 20px rgba(255, 0, 168, 0.25), inset 0 0 20px rgba(255, 0, 168, 0.04); }
+  .glow-cyan  { box-shadow: 0 0 20px rgba(0, 245, 255, 0.25), inset 0 0 20px rgba(0, 245, 255, 0.04); }
+  .glow-green { box-shadow: 0 0 20px rgba(57, 255, 20, 0.25),  inset 0 0 20px rgba(57, 255, 20, 0.04);  }
+
+  /* Page placeholder */
+  .page-placeholder {
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 0.08em;
+      color: var(--color-text);
+      margin-bottom: 8px;
+    }
+    p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--color-muted);
+    }
+  }
+}
+
+/* ─── Global Animations ───────────────────────────────────────────────────── */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes marquee-scroll {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes float-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96%            { opacity: 0.7; }
+  97%            { opacity: 1; }
+  98%            { opacity: 0.4; }
+  99%            { opacity: 1; }
+}

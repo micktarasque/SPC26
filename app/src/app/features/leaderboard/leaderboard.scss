@@ -1,0 +1,387 @@
+// ─── Pixel Typography ─────────────────────────────────────────────────────────
+
+.pixel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+
+  @media (min-width: 1024px) { font-size: 0.95rem; }
+}
+
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+
+  &.blink { animation: blink 1.2s step-end infinite; }
+}
+
+// ─── Dashboard Layout ─────────────────────────────────────────────────────────
+// Stretches to fill the content area on desktop; scrolls naturally on mobile.
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+  animation: float-up 0.4s ease both;
+}
+
+.bottom-row {
+  display: grid;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+
+  // Desktop: high-scores takes remaining width, season tracker is fixed width
+  grid-template-columns: 1fr 340px;
+
+  @media (min-width: 1280px) { grid-template-columns: 1fr 400px; }
+  @media (max-width: 1024px) { grid-template-columns: 1fr 300px; }
+  @media (max-width: 768px)  { grid-template-columns: 1fr; }
+}
+
+// ─── Widget 1: Next Stage Banner ──────────────────────────────────────────────
+
+.next-stage {
+  border-color: rgba(255, 0, 168, 0.4);
+  flex-shrink: 0;
+
+  .arcade-card-inner {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__bonus {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    color: var(--color-gold);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+    letter-spacing: 0.08em;
+    padding: 5px 12px;
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    border-radius: 4px;
+    background: rgba(255, 215, 0, 0.07);
+    opacity: 0;
+    transition: opacity 0.3s;
+
+    &.visible {
+      opacity: 1;
+      animation: glow-pulse 1.5s ease-in-out infinite;
+    }
+  }
+
+  &__body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  &__round { display: flex; flex-direction: column; gap: 4px; }
+
+  &__round-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1;
+    color: var(--color-accent);
+    text-shadow: 0 0 24px rgba(255, 0, 168, 0.55);
+    letter-spacing: 0.05em;
+  }
+
+  &__date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    letter-spacing: 0.12em;
+  }
+
+  &__event {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    color: var(--color-cyan);
+    text-shadow: 0 0 14px rgba(0, 245, 255, 0.45);
+    letter-spacing: 0.06em;
+    text-align: right;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__footer {
+    border-top: 1px solid var(--color-border);
+    padding-top: 10px;
+    text-align: center;
+  }
+}
+
+.insert-coin {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--color-accent);
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 8px rgba(255, 0, 168, 0.6);
+  animation: blink 1.4s step-end infinite;
+}
+
+// ─── Widget 2: High Scores ────────────────────────────────────────────────────
+
+.high-scores {
+  border-color: rgba(0, 245, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  .arcade-card-inner {
+    padding: 20px 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100%;
+    min-height: 0;
+  }
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  &__season {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--color-muted);
+    letter-spacing: 0.12em;
+  }
+
+  &__footer {
+    border-top: 1px solid var(--color-border);
+    padding-top: 10px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+}
+
+.scores-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 52px 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(0, 245, 255, 0.04);
+    border-color: rgba(0, 245, 255, 0.12);
+  }
+
+  &--leader {
+    background: rgba(255, 0, 168, 0.07);
+    border-color: rgba(255, 0, 168, 0.22);
+
+    .score-name {
+      color: var(--color-accent);
+      text-shadow: 0 0 10px rgba(255, 0, 168, 0.4);
+    }
+  }
+
+  &--danger .score-name { color: #8A6A6A; }
+}
+
+.score-rank {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.04em;
+
+  &[data-color="gold"]    { color: var(--color-gold);   text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+  &[data-color="silver"]  { color: var(--color-silver); }
+  &[data-color="bronze"]  { color: var(--color-bronze); }
+  &[data-color="default"] { color: var(--color-muted);  }
+}
+
+.score-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.score-streak {
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.score-net {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  min-width: 60px;
+  text-align: right;
+  white-space: nowrap;
+
+  &--pos  { color: var(--color-win);  text-shadow: 0 0 8px rgba(57, 255, 20, 0.4); }
+  &--neg  { color: var(--color-loss); text-shadow: 0 0 8px rgba(255, 59, 59, 0.4); }
+  &--null { color: var(--color-muted) !important; text-shadow: none !important; }
+}
+
+// ─── Widget 3: Season Tracker ─────────────────────────────────────────────────
+
+.season-tracker {
+  border-color: rgba(57, 255, 20, 0.3);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  .arcade-card-inner {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    min-height: 0;
+  }
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  &__progress {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8rem;
+    color: var(--color-win);
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+  }
+
+  &__subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    margin-top: -6px;
+    flex-shrink: 0;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 12px;
+    flex-shrink: 0;
+  }
+
+  &__footer {
+    border-top: 1px solid var(--color-border);
+    padding-top: 10px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+}
+
+.rounds-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  flex: 1;
+  align-content: start;
+}
+
+.round-pip {
+  font-size: 1.1rem;
+  text-align: center;
+  color: var(--color-muted);
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+  cursor: default;
+  line-height: 1.6;
+
+  &--done {
+    color: var(--color-win);
+    text-shadow: 0 0 6px rgba(57, 255, 20, 0.6);
+  }
+}
+
+.season-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+
+  &__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    text-transform: uppercase;
+  }
+
+  &__value {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.9rem;
+
+    &.cyan { color: var(--color-cyan);   text-shadow: 0 0 8px rgba(0, 245, 255, 0.5); }
+    &.pink { color: var(--color-accent); text-shadow: 0 0 8px rgba(255, 0, 168, 0.5); }
+    &.gold { color: var(--color-gold);   text-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
+  }
+}
+
+// ─── Loading / Error / Empty ───────────────────────────────────────────────────
+
+.state-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 40vh;
+
+  .pixel-title {
+    &.blink { animation: blink 1s step-end infinite; }
+    &.error { color: var(--color-loss); text-shadow: 0 0 10px rgba(255, 59, 59, 0.5); }
+  }
+}
+
+.state-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.empty-state {
+  padding: 28px 0;
+  text-align: center;
+}
