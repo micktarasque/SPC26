@@ -8,3 +8,6 @@ spc26 project details.md
 # OS
 .DS_Store
 Thumbs.db
+
+.git*
+.txt
