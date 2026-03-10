@@ -1,0 +1,253 @@
+// ─── Page Typography ───────────────────────────────────────────────────────────
+
+.pixel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+}
+
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+
+  &.blink { animation: blink 1.2s step-end infinite; }
+}
+
+// ─── Layout ────────────────────────────────────────────────────────────────────
+
+.users-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  animation: float-up 0.4s ease both;
+}
+
+// ─── Header ────────────────────────────────────────────────────────────────────
+
+.page-header {
+  border-color: rgba(255, 0, 168, 0.4);
+  flex-shrink: 0;
+
+  &__inner {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+}
+
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  text-shadow: 0 0 20px rgba(255, 0, 168, 0.5);
+  margin: 4px 0 0;
+  line-height: 1;
+}
+
+.player-count {
+  color: var(--color-cyan);
+  text-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
+}
+
+// ─── Add Player ────────────────────────────────────────────────────────────────
+
+.add-player {
+  border-color: rgba(255, 0, 168, 0.2);
+  flex-shrink: 0;
+
+  &__inner {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    @media (max-width: 480px) { flex-direction: column; }
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 180px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.08em;
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &::placeholder {
+      color: var(--color-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+    }
+
+    &:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 10px rgba(255, 0, 168, 0.25);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__btn {
+    white-space: nowrap;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+    padding: 10px 18px;
+    min-width: 90px;
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &__error {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--color-loss);
+    margin: 0;
+  }
+}
+
+// ─── Player List ───────────────────────────────────────────────────────────────
+
+.player-list {
+  border-color: rgba(0, 245, 255, 0.3);
+  flex: 1;
+
+  .arcade-card-inner {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.player-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.2s ease;
+  flex-wrap: wrap;
+
+  &:hover {
+    background: rgba(0, 245, 255, 0.04);
+    border-color: rgba(0, 245, 255, 0.12);
+  }
+
+  &--inactive {
+    opacity: 0.45;
+
+    &:hover { opacity: 0.6; }
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__status {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    letter-spacing: 0.06em;
+    color: var(--color-muted);
+    padding: 4px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    white-space: nowrap;
+
+    &--active {
+      color: var(--color-win);
+      border-color: rgba(57, 255, 20, 0.35);
+      text-shadow: 0 0 6px rgba(57, 255, 20, 0.5);
+    }
+  }
+
+  &__toggle {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    letter-spacing: 0.05em;
+    padding: 8px 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+}
+
+// ─── State screens ─────────────────────────────────────────────────────────────
+
+.state-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 40vh;
+
+  .pixel-title {
+    &.blink { animation: blink 1s step-end infinite; }
+    &.error { color: var(--color-loss); text-shadow: 0 0 10px rgba(255, 59, 59, 0.5); }
+  }
+}
+
+.state-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.empty-state {
+  padding: 28px 0;
+  text-align: center;
+}

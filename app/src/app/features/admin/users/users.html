@@ -1,4 +1,103 @@
-<div class="page-placeholder">
-  <h1>Users</h1>
-  <p>Player management coming soon.</p>
+<!-- Loading -->
+@if (loading()) {
+  <div class="state-screen">
+    <span class="pixel-title blink">LOADING...</span>
+  </div>
+}
+
+<!-- Error -->
+@if (error()) {
+  <div class="state-screen">
+    <span class="pixel-title error">&#x26A0; ERROR</span>
+    <p class="state-msg">{{ error() }}</p>
+  </div>
+}
+
+<!-- Page -->
+@if (!loading() && !error()) {
+<div class="users-page">
+
+  <!-- ═══ HEADER ═══ -->
+  <div class="page-header arcade-card glow-pink">
+    <div class="arcade-card-inner page-header__inner">
+      <div>
+        <span class="pixel-label">ADMIN</span>
+        <h1 class="page-title">PLAYER MANAGEMENT</h1>
+      </div>
+      <span class="player-count pixel-label">{{ users().length }} PLAYERS</span>
+    </div>
+  </div>
+
+  <!-- ═══ ADD PLAYER ═══ -->
+  <div class="add-player arcade-card">
+    <div class="arcade-card-inner add-player__inner">
+      <span class="pixel-label">NEW PLAYER</span>
+      <div class="add-player__form">
+        <input
+          class="add-player__input"
+          type="text"
+          placeholder="ENTER NAME..."
+          [value]="newName()"
+          (input)="newName.set($any($event.target).value)"
+          (keydown)="onKeydown($event)"
+          [disabled]="saving()"
+          maxlength="40"
+        />
+        <button
+          class="btn-primary add-player__btn"
+          (click)="addUser()"
+          [disabled]="saving() || !newName().trim()"
+        >
+          @if (saving()) { SAVING... } @else { + ADD }
+        </button>
+      </div>
+      @if (addError()) {
+        <p class="add-player__error">{{ addError() }}</p>
+      }
+    </div>
+  </div>
+
+  <!-- ═══ PLAYER LIST ═══ -->
+  <div class="player-list arcade-card glow-cyan">
+    <div class="arcade-card-inner">
+      <div class="player-list__header">
+        <span class="pixel-title">ROSTER</span>
+        <span class="pixel-label">{{ users().length }} PLAYERS</span>
+      </div>
+
+      @if (users().length === 0) {
+        <div class="empty-state">
+          <span class="pixel-label blink">&#x25B6; NO PLAYERS YET</span>
+        </div>
+      } @else {
+        <div class="player-rows">
+          @for (user of users(); track user.id) {
+            <div class="player-row" [class.player-row--inactive]="!user.active">
+              <div class="player-row__info">
+                <span class="player-row__name">{{ user.name }}</span>
+                <span class="player-row__status" [class.player-row__status--active]="user.active">
+                  {{ user.active ? 'ACTIVE' : 'INACTIVE' }}
+                </span>
+              </div>
+              <button
+                class="btn-ghost player-row__toggle"
+                (click)="toggleActive(user)"
+                [disabled]="togglingId() === user.id"
+              >
+                @if (togglingId() === user.id) {
+                  ...
+                } @else if (user.active) {
+                  DEACTIVATE
+                } @else {
+                  ACTIVATE
+                }
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
 </div>
+}

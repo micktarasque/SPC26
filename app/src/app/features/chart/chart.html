@@ -1,0 +1,172 @@
+<!-- Loading -->
+@if (loading()) {
+  <div class="state-screen">
+    <span class="pixel-title blink">LOADING...</span>
+  </div>
+}
+
+<!-- Error -->
+@if (error()) {
+  <div class="state-screen">
+    <span class="pixel-title error">&#9888; ERROR</span>
+    <p class="state-msg">{{ error() }}</p>
+  </div>
+}
+
+<!-- Chart page -->
+@if (!loading() && !error()) {
+  <div class="chart-page">
+
+    <!-- Header -->
+    <div class="chart-header">
+      <div>
+        <span class="pixel-label">SEASON 2026 &middot; {{ series().length }} PLAYERS</span>
+        <h1 class="chart-title">FORM GUIDE</h1>
+      </div>
+      <div class="chart-header__controls">
+        <button class="ctrl-btn" [class.ctrl-btn--active]="showPred()" (click)="togglePred()">
+          &#8213;&#8213; PREDICTIONS {{ showPred() ? 'ON' : 'OFF' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Banter disclaimer -->
+    <div class="pred-disclaimer">
+      <span class="pixel-label">
+        &#9889; PREDICTION LINES ARE FOR BANTER ONLY &middot; THE ALGORITHM HAS ABSOLUTELY NO IDEA &middot; DO NOT BET BASED ON THIS
+      </span>
+    </div>
+
+    <!-- SVG Chart -->
+    <div class="chart-wrap arcade-card">
+      <svg [attr.viewBox]="VB" class="chart-svg" preserveAspectRatio="xMidYMid meet" role="img">
+
+        @if (chart(); as c) {
+
+          <!-- Horizontal grid lines -->
+          @for (t of c.yTicks; track t.label) {
+            <line
+              [attr.x1]="CHARTX" [attr.x2]="CHARTX + CW"
+              [attr.y1]="t.y"    [attr.y2]="t.y"
+              class="grid-line"/>
+          }
+
+          <!-- Zero line -->
+          <line
+            [attr.x1]="CHARTX" [attr.x2]="CHARTX + CW"
+            [attr.y1]="c.y0"   [attr.y2]="c.y0"
+            class="zero-line"/>
+
+          <!-- Round slot guides (subtle) -->
+          @for (xl of c.xLabels; track xl.label) {
+            <line
+              [attr.x1]="xl.x" [attr.x2]="xl.x"
+              [attr.y1]="CHARTY" [attr.y2]="CHARTY + CH"
+              class="col-guide"/>
+          }
+
+          <!-- Bars (round-by-round net scores) -->
+          @for (b of c.bars; track b.key) {
+            <rect
+              [attr.x]="b.x" [attr.y]="b.y"
+              [attr.width]="b.w" [attr.height]="b.h"
+              [attr.fill]="b.color"
+              fill-opacity="0.72"
+              rx="1">
+              <title>{{ b.tip }}</title>
+            </rect>
+          }
+
+          <!-- Lines: predictions (dashed, drawn first) then actual (solid) on top -->
+          @for (l of c.lines; track l.key) {
+            <path
+              [attr.d]="l.d"
+              [attr.stroke]="l.color"
+              [attr.stroke-opacity]="l.op"
+              [attr.stroke-dasharray]="l.dash ? '7,5' : 'none'"
+              [attr.stroke-width]="l.dash ? 1.8 : 2.5"
+              fill="none"
+              stroke-linejoin="round"
+              stroke-linecap="round"/>
+          }
+
+          <!-- Y-axis labels -->
+          @for (t of c.yTicks; track t.label) {
+            <text
+              [attr.x]="CHARTX - 10" [attr.y]="t.y + 5"
+              text-anchor="end" class="axis-lbl">{{ t.label }}</text>
+          }
+
+          <!-- X-axis labels -->
+          @for (xl of c.xLabels; track xl.label) {
+            <text
+              [attr.x]="xl.x" [attr.y]="CHARTY + CH + 24"
+              text-anchor="middle" class="axis-lbl">{{ xl.label }}</text>
+          }
+
+          <!-- Chart border lines -->
+          <line
+            [attr.x1]="CHARTX" [attr.x2]="CHARTX"
+            [attr.y1]="CHARTY" [attr.y2]="CHARTY + CH"
+            class="axis-line"/>
+          <line
+            [attr.x1]="CHARTX" [attr.x2]="CHARTX + CW"
+            [attr.y1]="CHARTY + CH" [attr.y2]="CHARTY + CH"
+            class="axis-line"/>
+
+          <!-- Chart area labels -->
+          <text x="28" [attr.y]="CHARTY + 4" class="area-label" text-anchor="middle" transform="rotate(-90 28 200)">
+            NET (cumulative)
+          </text>
+          <text [attr.x]="CHARTX + CW / 2" [attr.y]="CHARTY + CH + 50" class="area-label" text-anchor="middle">
+            ROUND NUMBER
+          </text>
+
+        }
+
+      </svg>
+    </div>
+
+    <!-- Mobile scroll hint -->
+    <p class="scroll-hint">&#8592; SWIPE TO SCROLL &#8594;</p>
+
+    <!-- Legend -->
+    <div class="chart-legend">
+      @for (s of series(); track s.uid) {
+        <button
+          class="legend-item"
+          [class.legend-item--hidden]="isHidden(s.uid)"
+          (click)="toggleHide(s.uid)"
+          [title]="isHidden(s.uid) ? 'Show ' + s.name : 'Hide ' + s.name">
+          <span class="legend-swatch" [style.background]="s.color" [style.box-shadow]="'0 0 7px ' + s.color"></span>
+          <span class="legend-name">{{ s.name }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Key -->
+    <div class="chart-key">
+      <div class="key-item">
+        <svg width="32" height="12" class="key-svg">
+          <line x1="0" y1="6" x2="32" y2="6" stroke="rgba(200,170,240,0.8)" stroke-width="2.5"/>
+        </svg>
+        <span class="key-label">ACTUAL</span>
+      </div>
+      <div class="key-item">
+        <svg width="32" height="12" class="key-svg">
+          <line x1="0" y1="6" x2="32" y2="6" stroke="rgba(200,170,240,0.5)" stroke-width="1.8" stroke-dasharray="6,4"/>
+        </svg>
+        <span class="key-label">PREDICTED</span>
+      </div>
+      <div class="key-item">
+        <svg width="14" height="12" class="key-svg">
+          <rect x="0" y="1" width="14" height="10" fill="rgba(200,170,240,0.5)" rx="1"/>
+        </svg>
+        <span class="key-label">ROUND SCORE</span>
+      </div>
+      <span class="key-sep">&middot;</span>
+      <span class="key-label key-label--hint">CLICK LEGEND TO TOGGLE PLAYER</span>
+    </div>
+
+  </div>
+}

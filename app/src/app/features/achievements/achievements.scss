@@ -1,0 +1,326 @@
+// ─── Local Typography ───────────────────────────────────────────────────────
+
+.pixel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+}
+
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+  &.blink { animation: blink 1.2s step-end infinite; }
+}
+
+// ─── Loading / Error ────────────────────────────────────────────────────────
+
+.state-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 40vh;
+
+  .pixel-title {
+    &.blink { animation: blink 1s step-end infinite; }
+    &.error { color: var(--color-loss); text-shadow: 0 0 10px rgba(255, 59, 59, 0.5); }
+  }
+}
+
+.state-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+// ─── Page Layout ────────────────────────────────────────────────────────────
+
+.ach-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  animation: float-up 0.4s ease both;
+}
+
+// ─── Header ─────────────────────────────────────────────────────────────────
+
+.ach-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+}
+
+.ach-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+  line-height: 1;
+  margin: 4px 0 0;
+}
+
+.ach-counter {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+
+  &__val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--color-gold);
+    text-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+    line-height: 1;
+  }
+
+  &__sep {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    color: rgba(180, 150, 220, 0.5);
+  }
+
+  &__total {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    color: rgba(180, 150, 220, 0.6);
+    line-height: 1;
+  }
+}
+
+// ─── Progress Bar ────────────────────────────────────────────────────────────
+
+.ach-progress-wrap {
+  height: 4px;
+  background: rgba(42, 24, 80, 0.8);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ach-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-gold), var(--color-win));
+  border-radius: 2px;
+  transition: width 1s ease;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+// ─── Category Section ────────────────────────────────────────────────────────
+
+.ach-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: float-up 0.4s ease both;
+}
+
+.ach-section__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(42, 24, 80, 0.8);
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(42, 24, 80, 0.8), transparent);
+  }
+}
+
+.ach-section__icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.ach-section__name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: rgba(180, 150, 220, 0.85);
+}
+
+.ach-section__count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(180, 150, 220, 0.5);
+  white-space: nowrap;
+}
+
+// ─── Achievement Grid ────────────────────────────────────────────────────────
+
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+}
+
+// ─── Achievement Card ────────────────────────────────────────────────────────
+
+.ach-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+
+  // Scanline texture (inherits from arcade-card concept)
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.04) 2px,
+      rgba(0, 0, 0, 0.04) 4px
+    );
+    pointer-events: none;
+  }
+
+  &:hover:not(.ach-card--locked) {
+    transform: translateY(-2px);
+  }
+
+  // Rarity base colors
+  &--legendary { background: linear-gradient(160deg, rgba(255, 215, 0, 0.06), var(--color-card)); }
+  &--rare      { background: linear-gradient(160deg, rgba(0, 245, 255, 0.05), var(--color-card)); }
+  &--uncommon  { background: linear-gradient(160deg, rgba(168, 85, 247, 0.06), var(--color-card)); }
+  &--common    { background: var(--color-card); }
+
+  // Locked state
+  &--locked {
+    opacity: 0.45;
+    filter: grayscale(0.6);
+    border-color: rgba(42, 24, 80, 0.6) !important;
+    box-shadow: none !important;
+  }
+
+  @media (max-width: 480px) {
+    padding: 12px 8px 10px;
+    gap: 4px;
+  }
+}
+
+.ach-card__lock {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.ach-card__icon {
+  font-size: 2.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px currentColor);
+
+  &--locked { filter: grayscale(1) opacity(0.5); }
+
+  @media (max-width: 480px) { font-size: 2rem; }
+}
+
+.ach-card__rarity {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.3rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(180, 150, 220, 0.5);
+
+  @media (max-width: 480px) { font-size: 0.28rem; }
+}
+
+.ach-card__name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+  line-height: 1.1;
+
+  &--locked { color: rgba(180, 150, 220, 0.4); }
+
+  @media (max-width: 480px) { font-size: 0.9rem; }
+}
+
+.ach-card__desc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.56rem;
+  color: rgba(180, 150, 220, 0.65);
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  flex: 1;
+
+  @media (max-width: 480px) { font-size: 0.5rem; }
+}
+
+.ach-card__footer {
+  width: 100%;
+  margin-top: 4px;
+  border-top: 1px solid rgba(42, 24, 80, 0.6);
+  padding-top: 8px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ach-card__not-yet {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.28rem;
+  letter-spacing: 0.08em;
+  color: rgba(130, 100, 170, 0.4);
+
+  @media (max-width: 480px) { font-size: 0.26rem; }
+}
+
+// ─── Earner Chips ────────────────────────────────────────────────────────────
+
+.ach-earners {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+}
+
+.ach-earner-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  background: rgba(0, 245, 255, 0.1);
+  border: 1px solid rgba(0, 245, 255, 0.25);
+  border-radius: 3px;
+  padding: 2px 6px;
+  white-space: nowrap;
+
+  @media (max-width: 480px) { font-size: 0.5rem; padding: 2px 5px; }
+}

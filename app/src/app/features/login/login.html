@@ -1,4 +1,70 @@
-<div class="page-placeholder">
-  <h1>Admin Login</h1>
-  <p>Login form coming soon.</p>
+<div class="login-page">
+  <div class="login-card arcade-card glow-pink">
+    <div class="arcade-card-inner">
+
+      <!-- Header -->
+      <div class="login-card__header">
+        <span class="pixel-label blink">● RESTRICTED AREA</span>
+        <h1 class="login-card__title">TIPBOARD</h1>
+        <p class="login-card__subtitle">ADMIN ACCESS ONLY</p>
+      </div>
+
+      <!-- Error -->
+      @if (error()) {
+        <div class="login-card__error">
+          <span class="pixel-label">⚠ {{ error() }}</span>
+        </div>
+      }
+
+      <!-- Form -->
+      <form class="login-form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <div class="login-form__field">
+          <label class="login-form__label pixel-label" for="email">EMAIL</label>
+          <input
+            id="email"
+            class="login-form__input"
+            type="email"
+            name="email"
+            [(ngModel)]="email"
+            placeholder="admin@example.com"
+            autocomplete="username"
+            required
+            [disabled]="loading()"
+          />
+        </div>
+
+        <div class="login-form__field">
+          <label class="login-form__label pixel-label" for="password">PASSWORD</label>
+          <input
+            id="password"
+            class="login-form__input"
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+            [disabled]="loading()"
+          />
+        </div>
+
+        <button
+          class="btn-primary login-form__submit"
+          type="submit"
+          [disabled]="loading() || !email || !password"
+        >
+          @if (loading()) {
+            <span class="blink">AUTHENTICATING...</span>
+          } @else {
+            ▶ ENTER
+          }
+        </button>
+      </form>
+
+      <div class="login-card__footer">
+        <span class="pixel-label">NOT A PUBLIC SIGN-UP PAGE</span>
+      </div>
+
+    </div>
+  </div>
 </div>

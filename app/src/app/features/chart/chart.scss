@@ -1,0 +1,307 @@
+// ─── Local Typography ───────────────────────────────────────────────────────
+
+.pixel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+}
+
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+  &.blink { animation: blink 1.2s step-end infinite; }
+}
+
+// ─── Loading / Error ────────────────────────────────────────────────────────
+
+.state-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 40vh;
+
+  .pixel-title {
+    &.blink { animation: blink 1s step-end infinite; }
+    &.error { color: var(--color-loss); text-shadow: 0 0 10px rgba(255, 59, 59, 0.5); }
+  }
+}
+
+.state-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+// ─── Page Layout ────────────────────────────────────────────────────────────
+
+.chart-page {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  animation: float-up 0.4s ease both;
+}
+
+.chart-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.chart-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+  line-height: 1;
+  margin: 4px 0 0;
+}
+
+.chart-header__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ctrl-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(90, 62, 122, 0.6);
+  color: rgba(180, 150, 220, 0.65);
+  padding: 7px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    border-color: var(--color-cyan);
+    color: var(--color-cyan);
+  }
+
+  &--active {
+    border-color: var(--color-cyan);
+    color: var(--color-cyan);
+    box-shadow: 0 0 10px rgba(0, 245, 255, 0.18);
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.55rem;
+    padding: 6px 10px;
+  }
+}
+
+// ─── Disclaimer ─────────────────────────────────────────────────────────────
+
+.pred-disclaimer {
+  padding: 6px 12px;
+  background: rgba(255, 0, 168, 0.06);
+  border: 1px solid rgba(255, 0, 168, 0.22);
+  border-radius: 4px;
+  text-align: center;
+
+  .pixel-label {
+    font-size: 0.38rem;
+    color: rgba(255, 0, 168, 0.75);
+    line-height: 1.8;
+
+    @media (max-width: 480px) {
+      font-size: 0.34rem;
+    }
+  }
+}
+
+// ─── SVG Chart Container ────────────────────────────────────────────────────
+
+.chart-wrap {
+  // Horizontal scroll on mobile so chart stays readable
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px;
+  // Subtle scroll hint on mobile
+  @media (max-width: 767px) {
+    border-radius: 8px;
+    // Fade edges to hint at scroll
+    mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 12px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 12px), transparent 100%);
+  }
+}
+
+.chart-svg {
+  display: block;
+  height: auto;
+  // On desktop: fill width. On mobile: fixed min-width so content stays readable
+  width: 100%;
+  min-width: 640px;
+
+  @media (max-width: 767px) {
+    min-width: 700px;   // ensures bars/labels stay legible on scroll
+    width: 700px;
+  }
+}
+
+// SVG element classes via CSS
+:host ::ng-deep {
+  .chart-svg {
+    .axis-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;          // SVG user units
+      fill: rgba(180, 150, 220, 0.85);
+    }
+
+    .area-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      fill: rgba(130, 100, 180, 0.5);
+      letter-spacing: 1px;
+    }
+
+    .grid-line {
+      stroke: rgba(90, 62, 122, 0.35);
+      stroke-width: 1;
+    }
+
+    .zero-line {
+      stroke: rgba(0, 245, 255, 0.28);
+      stroke-width: 1.5;
+      stroke-dasharray: 5, 5;
+    }
+
+    .col-guide {
+      stroke: rgba(90, 62, 122, 0.15);
+      stroke-width: 1;
+    }
+
+    .axis-line {
+      stroke: rgba(90, 62, 122, 0.9);
+      stroke-width: 1.5;
+    }
+  }
+}
+
+// ─── Scroll hint label ───────────────────────────────────────────────────────
+
+.scroll-hint {
+  display: none;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(180, 150, 220, 0.5);
+  padding-top: 2px;
+
+  @media (max-width: 767px) {
+    display: block;
+  }
+}
+
+// ─── Legend ─────────────────────────────────────────────────────────────────
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(90, 62, 122, 0.5);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s, border-color 0.2s;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+
+  &:hover { border-color: rgba(255, 255, 255, 0.3); }
+
+  &--hidden {
+    opacity: 0.3;
+    filter: grayscale(1);
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.6rem;
+    padding: 5px 10px;
+  }
+}
+
+.legend-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+// ─── Key ────────────────────────────────────────────────────────────────────
+
+.chart-key {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 2px;
+
+  @media (max-width: 480px) {
+    gap: 10px;
+  }
+}
+
+.key-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.key-svg {
+  flex-shrink: 0;
+}
+
+.key-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: rgba(180, 150, 220, 0.65);
+  text-transform: uppercase;
+
+  &--hint {
+    font-size: 0.52rem;
+    color: rgba(130, 100, 170, 0.5);
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.5rem;
+    &--hint { display: none; }
+  }
+}
+
+.key-sep {
+  color: rgba(90, 62, 122, 0.6);
+  font-size: 1rem;
+
+  @media (max-width: 480px) {
+    display: none;
+  }
+}

@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from './core/auth.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { AuthService } from './core/auth.service';
 export class App {
   sidebarOpen = signal(false);
 
-  constructor(readonly auth: AuthService) {}
+  constructor(readonly auth: AuthService, private router: Router) {}
 
   toggleSidebar() {
     this.sidebarOpen.update(v => !v);
@@ -19,5 +19,10 @@ export class App {
 
   closeSidebar() {
     this.sidebarOpen.set(false);
+  }
+
+  async signOut() {
+    await this.auth.signOut();
+    this.router.navigate(['/']);
   }
 }

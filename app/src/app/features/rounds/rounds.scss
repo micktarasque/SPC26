@@ -1,0 +1,385 @@
+// ─── Local Typography ─────────────────────────────────────────────────────────
+
+.pixel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+}
+
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+
+  &.blink { animation: blink 1.2s step-end infinite; }
+}
+
+// ─── Loading / Error ──────────────────────────────────────────────────────────
+
+.state-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 40vh;
+
+  .pixel-title {
+    &.blink { animation: blink 1s step-end infinite; }
+    &.error { color: var(--color-loss); text-shadow: 0 0 10px rgba(255, 59, 59, 0.5); }
+  }
+}
+
+.state-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+// ─── Page Layout ──────────────────────────────────────────────────────────────
+
+.rounds-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+  animation: float-up 0.4s ease both;
+}
+
+.rounds-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+
+  &__meta { text-align: right; }
+}
+
+.rounds-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+  line-height: 1;
+  margin: 4px 0 0;
+}
+
+// ─── Grid Card ────────────────────────────────────────────────────────────────
+// Manually replicates .arcade-card visuals WITHOUT overflow:hidden, so that
+// position:sticky works correctly inside the inner scroll container.
+
+.grid-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  position: relative;
+  // overflow:clip clips visual overflow (border-radius) but does NOT create a
+  // scroll container, keeping position:sticky scoped to the inner scroll wrapper.
+  overflow: clip;
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.25), inset 0 0 20px rgba(0, 245, 255, 0.04);
+  flex: 1;
+  min-height: 0;
+
+  // Scanline overlay
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.12) 2px,
+      rgba(0, 0, 0, 0.12) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+.grid-inner {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+  flex: 1;
+}
+
+// ─── Scroll Wrapper ───────────────────────────────────────────────────────────
+
+.grid-scroll-wrap {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar { width: 6px; height: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+}
+
+// ─── Heat Table ───────────────────────────────────────────────────────────────
+
+.heat-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate; // required: border-collapse breaks position:sticky in Safari
+  border-spacing: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+// ─── Header Row ───────────────────────────────────────────────────────────────
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--color-card-2);
+  border-bottom: 1px solid var(--color-border);
+  border-right: 1px solid rgba(42, 24, 80, 0.5);
+  white-space: nowrap;
+  vertical-align: bottom;
+  padding: 10px 6px 8px;
+  text-align: center;
+}
+
+// Corner cell: sticky in both x and y
+.corner-cell {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  text-align: left;
+  padding: 10px 16px 8px;
+  min-width: 130px;
+  border-right: 1px solid var(--color-border) !important;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.round-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.bonus-icon {
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--color-gold);
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+  animation: glow-pulse 1.5s ease-in-out infinite;
+}
+
+.round-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+}
+
+.round-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--color-muted);
+  letter-spacing: 0.04em;
+}
+
+// Bonus round header column
+.col-round.col-bonus {
+  background-color: rgba(255, 215, 0, 0.08) !important;
+  border-bottom-color: rgba(255, 215, 0, 0.3) !important;
+
+  .round-num { color: var(--color-gold); text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+}
+
+// ─── Sticky Left Column (Player Names) ────────────────────────────────────────
+
+.sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: var(--color-card);
+  border-right: 1px solid var(--color-border) !important;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.4);
+}
+
+// ─── Player Rows ──────────────────────────────────────────────────────────────
+
+tbody tr {
+  border-bottom: 1px solid rgba(42, 24, 80, 0.4);
+}
+
+tbody td {
+  border-bottom: 1px solid rgba(42, 24, 80, 0.35);
+  border-right: 1px solid rgba(42, 24, 80, 0.25);
+  transition: background 0.1s ease;
+}
+
+.player-row:hover td { background: rgba(0, 245, 255, 0.025); }
+.player-row:hover .sticky-col { background: var(--color-card-2); }
+
+.col-player {
+  padding: 0 14px;
+  min-width: 130px;
+}
+
+.player-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+  white-space: nowrap;
+  display: block;
+  padding: 6px 0;
+}
+
+// ─── Heat Cells ───────────────────────────────────────────────────────────────
+
+.heat-cell {
+  text-align: center;
+  padding: 0;
+  min-width: 70px;
+  transition: background 0.1s ease;
+
+  // Heat colour bands — relative to round average
+  &.cell--above { background-color: rgba(57, 255, 20, 0.10); }
+  &.cell--below { background-color: rgba(255, 59, 59, 0.09); }
+  &.cell--null  { background-color: transparent; }
+
+  // Bonus column tints (additive — combined with heat)
+  &.col-bonus              { background-color: rgba(255, 215, 0, 0.04); }
+  &.col-bonus.cell--above  { background-color: rgba(57, 255, 20, 0.12); }
+  &.col-bonus.cell--below  { background-color: rgba(255, 59, 59, 0.11); }
+  &.col-bonus.cell--null   { background-color: rgba(255, 215, 0, 0.03); }
+}
+
+.cell-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px;
+  min-height: 50px;
+}
+
+.cell-gross {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+
+  &.score-positive { color: var(--color-win);  text-shadow: 0 0 6px rgba(57, 255, 20, 0.45); }
+  &.score-negative { color: var(--color-loss); text-shadow: 0 0 6px rgba(255, 59, 59, 0.45); }
+  &.score-null     { color: var(--color-muted); font-weight: 400; }
+}
+
+.mult-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.4rem;
+  color: var(--color-gold);
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+  letter-spacing: 0.04em;
+  background: rgba(255, 215, 0, 0.10);
+  border: 1px solid rgba(255, 215, 0, 0.28);
+  border-radius: 3px;
+  padding: 1px 4px;
+  animation: glow-pulse 1.5s ease-in-out infinite;
+  white-space: nowrap;
+}
+
+// ─── Summary Row ──────────────────────────────────────────────────────────────
+
+.summary-row {
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+
+  td {
+    background: var(--color-card-2) !important;
+    border-top: 1px solid var(--color-border);
+    border-bottom: none;
+    border-right: 1px solid rgba(42, 24, 80, 0.4);
+  }
+
+  .sticky-col {
+    z-index: 25;
+    background: var(--color-card-2) !important;
+  }
+}
+
+.summary-label {
+  padding: 8px 14px;
+}
+
+.summary-cell {
+  padding: 0;
+  text-align: center;
+  min-width: 70px;
+
+  &.col-bonus { background-color: rgba(255, 215, 0, 0.06) !important; }
+}
+
+.summary-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+}
+
+.summary-winner {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--color-gold);
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.45);
+  white-space: nowrap;
+  max-width: 84px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.score-null { color: var(--color-muted); text-shadow: none; }
+}
+
+.summary-high {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  &.score-positive { color: var(--color-win); }
+  &.score-negative { color: var(--color-loss); }
+  &.score-null     { color: var(--color-muted); }
+}
+
+.summary-avg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--color-muted);
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .rounds-title       { font-size: 1.8rem; }
+  .player-name        { font-size: 1.05rem; }
+  .heat-cell,
+  .summary-cell       { min-width: 58px; }
+  .col-player         { min-width: 110px; }
+  .corner-cell        { min-width: 110px; }
+}

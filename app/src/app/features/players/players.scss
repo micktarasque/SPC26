@@ -1,0 +1,604 @@
+// ─── Local Typography ──────────────────────────────────────────────────────────
+
+.pixel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+}
+
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+  &.blink { animation: blink 1.2s step-end infinite; }
+}
+
+// ─── Loading / Error ───────────────────────────────────────────────────────────
+
+.state-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 40vh;
+
+  .pixel-title {
+    &.blink { animation: blink 1s step-end infinite; }
+    &.error { color: var(--color-loss); text-shadow: 0 0 10px rgba(255, 59, 59, 0.5); }
+  }
+}
+
+.state-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+// ─── Page Layout ───────────────────────────────────────────────────────────────
+
+.players-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  animation: float-up 0.4s ease both;
+}
+
+.players-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+  &__meta { text-align: right; }
+}
+
+.players-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+  line-height: 1;
+  margin: 4px 0 0;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+}
+
+// ─── List Container ────────────────────────────────────────────────────────────
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+// ─── Player Card ───────────────────────────────────────────────────────────────
+
+.player-card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  animation: float-up 0.4s ease both;
+  border-color: var(--color-border);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba(0, 245, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.12);
+  }
+
+  &.pc--rank-1 {
+    border-color: rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.12), inset 0 0 30px rgba(255, 215, 0, 0.03);
+    &:hover { box-shadow: 0 0 28px rgba(255, 215, 0, 0.25); }
+  }
+
+  &.pc--rank-2 {
+    border-color: rgba(170, 170, 170, 0.3);
+  }
+
+  &.pc--rank-3 {
+    border-color: rgba(205, 127, 50, 0.3);
+  }
+
+  &.pc--last {
+    border-color: rgba(255, 59, 59, 0.3);
+    box-shadow: 0 0 16px rgba(255, 59, 59, 0.08);
+  }
+
+  &.pc--inactive {
+    opacity: 0.55;
+    filter: grayscale(0.5);
+  }
+
+  &.pc--expanded {
+    border-color: rgba(0, 245, 255, 0.4);
+    box-shadow: 0 0 24px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(0, 245, 255, 0.04);
+
+    &.pc--rank-1 {
+      border-color: rgba(255, 215, 0, 0.6);
+      box-shadow: 0 0 28px rgba(255, 215, 0, 0.2);
+    }
+  }
+}
+
+// ─── Main Row ──────────────────────────────────────────────────────────────────
+
+.pc-main {
+  display: grid;
+  grid-template-columns: 88px 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 70px 1fr auto auto;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+}
+
+// ─── Rank Block ────────────────────────────────────────────────────────────────
+
+.pc-rank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 6px;
+  border-radius: 6px;
+  border: 1px solid;
+  gap: 3px;
+  flex-shrink: 0;
+
+  &__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  &__num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    line-height: 1;
+    letter-spacing: 0.06em;
+  }
+
+  &--gold {
+    border-color: rgba(255, 215, 0, 0.5);
+    background: rgba(255, 215, 0, 0.08);
+    .pc-rank__label, .pc-rank__num { color: var(--color-gold); text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+  }
+
+  &--silver {
+    border-color: rgba(170, 170, 170, 0.4);
+    background: rgba(170, 170, 170, 0.06);
+    .pc-rank__label, .pc-rank__num { color: #c0c0c0; }
+  }
+
+  &--bronze {
+    border-color: rgba(205, 127, 50, 0.4);
+    background: rgba(205, 127, 50, 0.07);
+    .pc-rank__label, .pc-rank__num { color: var(--color-bronze); }
+  }
+
+  &--default {
+    border-color: var(--color-border);
+    background: transparent;
+    .pc-rank__label, .pc-rank__num { color: var(--color-muted); }
+  }
+}
+
+// ─── Identity ──────────────────────────────────────────────────────────────────
+
+.pc-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+
+  &__row1 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+}
+
+.pc-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  letter-spacing: 0.07em;
+  color: var(--color-text);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  .pc--rank-1 & {
+    color: var(--color-gold);
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+  }
+}
+
+.pc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: rgba(180, 150, 220, 0.9);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.pc-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.dot--active {
+    background: var(--color-win);
+    box-shadow: 0 0 6px var(--color-win);
+    animation: glow-pulse 2s infinite;
+  }
+
+  &.dot--inactive {
+    background: var(--color-muted);
+  }
+}
+
+// ─── Form Pips ─────────────────────────────────────────────────────────────────
+
+.pc-form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgba(180, 150, 220, 0.85);
+    text-transform: uppercase;
+    margin-right: 2px;
+  }
+}
+
+.pc-pip {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  transition: transform 0.1s ease;
+
+  &:hover { transform: scaleY(1.2); }
+
+  &--win  {
+    background: rgba(57, 255, 20, 0.2);
+    border: 1px solid rgba(57, 255, 20, 0.5);
+    box-shadow: 0 0 4px rgba(57, 255, 20, 0.2);
+  }
+  &--loss {
+    background: rgba(255, 59, 59, 0.18);
+    border: 1px solid rgba(255, 59, 59, 0.45);
+  }
+  &--null {
+    background: transparent;
+    border: 1px solid rgba(90, 62, 122, 0.35);
+  }
+}
+
+.pc-streak {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: rgba(200, 170, 240, 0.9);
+  margin-left: 4px;
+}
+
+// ─── Achievement Badge Icons (main card) ────────────────────────────────────
+
+.pc-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.pc-badge {
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 4px;
+  padding: 2px 3px;
+  cursor: default;
+  transition: transform 0.15s ease;
+
+  &:hover { transform: scale(1.25); }
+
+  &--common    { background: rgba(90, 62, 122, 0.25); }
+  &--uncommon  { background: rgba(168, 85, 247, 0.18); box-shadow: 0 0 6px rgba(168, 85, 247, 0.3); }
+  &--rare      { background: rgba(0, 245, 255, 0.12); box-shadow: 0 0 6px rgba(0, 245, 255, 0.3); }
+  &--legendary { background: rgba(255, 215, 0, 0.15); box-shadow: 0 0 8px rgba(255, 215, 0, 0.4); animation: glow-pulse 2s infinite; }
+}
+
+// ─── Achievement List (expanded) ────────────────────────────────────────────
+
+.pc-achievements {
+  margin-bottom: 14px;
+
+  &__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(180, 150, 220, 0.7);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+.pc-ach {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid;
+  transition: border-color 0.15s;
+
+  &--common    { border-color: rgba(90, 62, 122, 0.5);  background: rgba(90, 62, 122, 0.1); }
+  &--uncommon  { border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.08); }
+  &--rare      { border-color: rgba(0, 245, 255, 0.35); background: rgba(0, 245, 255, 0.06); }
+  &--legendary {
+    border-color: rgba(255, 215, 0, 0.5);
+    background: rgba(255, 215, 0, 0.07);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.1);
+  }
+
+  &__icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-text);
+    text-transform: uppercase;
+  }
+
+  &__desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.58rem;
+    color: rgba(180, 150, 220, 0.75);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @media (max-width: 480px) { font-size: 0.52rem; }
+  }
+
+  &__rarity {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.32rem;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+
+    .pc-ach--common    & { color: rgba(180, 150, 220, 0.5); }
+    .pc-ach--uncommon  & { color: rgba(168, 85, 247, 0.8); }
+    .pc-ach--rare      & { color: rgba(0, 245, 255, 0.8); }
+    .pc-ach--legendary & { color: rgba(255, 215, 0, 0.9); text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+  }
+}
+
+// ─── Key Stats ─────────────────────────────────────────────────────────────────
+
+.pc-keystats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.pc-kstat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+
+  &__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(180, 150, 220, 0.85);
+    text-transform: uppercase;
+  }
+
+  &__val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+}
+
+// Shared value color modifiers
+.kv--pos  { color: var(--color-win);  text-shadow: 0 0 8px rgba(57, 255, 20, 0.4); }
+.kv--neg  { color: var(--color-loss); text-shadow: 0 0 8px rgba(255, 59, 59, 0.4); }
+.kv--null { color: var(--color-muted); }
+
+// ─── Chevron ───────────────────────────────────────────────────────────────────
+
+.pc-chevron {
+  font-size: 0.65rem;
+  color: var(--color-muted);
+  flex-shrink: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+  padding: 4px;
+
+  &--open {
+    transform: rotate(180deg);
+    color: var(--color-cyan);
+  }
+}
+
+// ─── Net Progress Bar ──────────────────────────────────────────────────────────
+
+.pc-bar-wrap {
+  height: 3px;
+  background: rgba(42, 24, 80, 0.6);
+  margin: 0 20px;
+  border-radius: 2px;
+  overflow: hidden;
+
+  @media (max-width: 600px) { margin: 0 14px; }
+}
+
+.pc-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-cyan), var(--color-accent));
+  border-radius: 2px;
+  transition: width 0.8s ease;
+
+  .pc--rank-1 & {
+    background: linear-gradient(90deg, var(--color-gold), var(--color-win));
+  }
+}
+
+// ─── Expanded Details ──────────────────────────────────────────────────────────
+
+.pc-details {
+  padding: 0 20px 18px;
+  animation: float-up 0.25s ease both;
+
+  @media (max-width: 600px) { padding: 0 14px 14px; }
+}
+
+.pc-details__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 14px;
+  margin-bottom: 14px;
+
+  @media (max-width: 900px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 480px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+.pc-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 8px;
+  background: var(--color-card-2);
+  border: 1px solid rgba(42, 24, 80, 0.6);
+  border-radius: 6px;
+  text-align: center;
+  transition: border-color 0.15s ease;
+
+  &:hover { border-color: rgba(0, 245, 255, 0.2); }
+
+  &__icon {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  &__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: rgba(180, 150, 220, 0.85);
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  &__val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+
+    &--win     { color: var(--color-win);    text-shadow: 0 0 8px rgba(57, 255, 20, 0.4); }
+    &--loss    { color: var(--color-loss);   text-shadow: 0 0 8px rgba(255, 59, 59, 0.4); }
+    &--gold    { color: var(--color-gold);   text-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
+    &--neutral { color: var(--color-cyan); }
+    &--warn    { color: var(--color-loss); }
+  }
+}
+
+// ─── Footer Totals ─────────────────────────────────────────────────────────────
+
+.pc-details__footer {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid rgba(42, 24, 80, 0.5);
+
+  @media (max-width: 480px) { gap: 12px; }
+}
+
+.pc-total {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  &__label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgba(180, 150, 220, 0.85);
+    text-transform: uppercase;
+  }
+
+  &__val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-text);
+
+    &--neutral { color: var(--color-cyan); }
+  }
+}

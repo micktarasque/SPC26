@@ -1,0 +1,10 @@
+# Claude Code session data
+.claude/
+
+# Internal planning docs — not for repo
+agent_protocol.txt
+spc26 project details.md
+
+# OS
+.DS_Store
+Thumbs.db

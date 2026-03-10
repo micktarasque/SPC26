@@ -1,4 +1,137 @@
-<div class="page-placeholder">
-  <h1>Results Table</h1>
-  <p>Round grid coming soon.</p>
-</div>
+<!-- Loading -->
+@if (loading()) {
+  <div class="state-screen">
+    <span class="pixel-title blink">LOADING...</span>
+  </div>
+}
+
+<!-- Error -->
+@if (error()) {
+  <div class="state-screen">
+    <span class="pixel-title error">&#9888; ERROR</span>
+    <p class="state-msg">{{ error() }}</p>
+  </div>
+}
+
+<!-- Rounds Grid -->
+@if (!loading() && !error()) {
+  <div class="rounds-page">
+
+    <!-- Page Header -->
+    <div class="rounds-header">
+      <div>
+        <span class="pixel-label">SEASON 2026</span>
+        <h1 class="rounds-title">RESULTS GRID</h1>
+      </div>
+      <div class="rounds-header__meta">
+        <span class="pixel-label">
+          {{ roundCols().length }} ROUNDS &middot; {{ playerRows().length }} PLAYERS
+        </span>
+      </div>
+    </div>
+
+    <!-- Grid Card -->
+    <div class="grid-card">
+      <div class="grid-inner">
+
+        @if (roundCols().length === 0) {
+          <div class="empty-state">
+            <span class="pixel-label blink">&#9654; NO RESULTS YET</span>
+          </div>
+        } @else {
+
+          <div class="grid-scroll-wrap">
+            <table class="heat-table">
+
+              <!-- Header Row -->
+              <thead>
+                <tr>
+                  <th class="col-player corner-cell">
+                    <span class="pixel-label">PLAYER</span>
+                  </th>
+
+                  @for (col of roundCols(); track col.round_number) {
+                    <th class="col-round" [class.col-bonus]="col.isBonus">
+                      <div class="round-header">
+                        @if (col.isBonus) {
+                          <span class="bonus-icon">&#9889;</span>
+                        }
+                        <span class="round-num">R{{ roundLabel(col.round_number) }}</span>
+                        <span class="round-date">{{ formatDate(col.round_date) }}</span>
+                      </div>
+                    </th>
+                  }
+                </tr>
+              </thead>
+
+              <!-- Player Rows -->
+              <tbody>
+                @for (player of playerRows(); track player.user_id) {
+                  <tr class="player-row">
+                    <td class="col-player sticky-col">
+                      <span class="player-name">{{ player.name }}</span>
+                    </td>
+
+                    @for (col of roundCols(); track col.round_number) {
+                      @let cell = getCell(player, col.round_number);
+                      <td
+                        class="heat-cell"
+                        [class.cell--above]="isAboveAvg(cell, col)"
+                        [class.cell--below]="isBelowAvg(cell, col)"
+                        [class.cell--null]="cell.gross === null"
+                        [class.col-bonus]="col.isBonus"
+                      >
+                        <div class="cell-inner">
+                          <span
+                            class="cell-gross"
+                            [class.score-positive]="cell.gross !== null && cell.gross > 0"
+                            [class.score-negative]="cell.gross !== null && cell.gross < 0"
+                            [class.score-null]="cell.gross === null"
+                          >{{ formatGross(cell.gross) }}</span>
+                          @if (cell.apply_multiplier) {
+                            <span class="mult-badge">&#9889;&times;2</span>
+                          }
+                        </div>
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+
+              <!-- Summary Row (pinned bottom) -->
+              <tfoot>
+                <tr class="summary-row">
+                  <td class="col-player sticky-col summary-label">
+                    <span class="pixel-label">SUMMARY</span>
+                  </td>
+
+                  @for (col of roundCols(); track col.round_number) {
+                    <td class="summary-cell" [class.col-bonus]="col.isBonus">
+                      <div class="summary-inner">
+                        @if (col.winner) {
+                          <span class="summary-winner">{{ col.winner }}</span>
+                        } @else {
+                          <span class="summary-winner score-null">&mdash;</span>
+                        }
+                        <span
+                          class="summary-high"
+                          [class.score-positive]="col.highestGross !== null && col.highestGross > 0"
+                          [class.score-negative]="col.highestGross !== null && col.highestGross < 0"
+                          [class.score-null]="col.highestGross === null"
+                        >{{ formatGross(col.highestGross) }}</span>
+                        <span class="summary-avg">&#216; {{ formatAvg(col.avgGross) }}</span>
+                      </div>
+                    </td>
+                  }
+                </tr>
+              </tfoot>
+
+            </table>
+          </div>
+
+        }
+      </div>
+    </div>
+
+  </div>
+}

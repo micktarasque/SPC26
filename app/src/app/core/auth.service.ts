@@ -5,9 +5,11 @@ import { SupabaseService } from './supabase.service';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   session = signal<Session | null>(null);
+  /** Resolves once the initial session check completes — await in guards to avoid race conditions. */
+  readonly sessionReady: Promise<void>;
 
   constructor(private supabase: SupabaseService) {
-    this.supabase.client.auth.getSession().then(({ data }) => {
+    this.sessionReady = this.supabase.client.auth.getSession().then(({ data }) => {
       this.session.set(data.session);
     });
 

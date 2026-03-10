@@ -1,0 +1,110 @@
+<!-- Loading -->
+@if (loading()) {
+  <div class="state-screen">
+    <span class="pixel-title blink">LOADING...</span>
+  </div>
+}
+
+<!-- Error -->
+@if (error()) {
+  <div class="state-screen">
+    <span class="pixel-title error">&#9888; ERROR</span>
+    <p class="state-msg">{{ error() }}</p>
+  </div>
+}
+
+<!-- Achievements page -->
+@if (!loading() && !error()) {
+  <div class="ach-page">
+
+    <!-- Header -->
+    <div class="ach-header">
+      <div>
+        <span class="pixel-label">SEASON 2026</span>
+        <h1 class="ach-title">ACHIEVEMENTS</h1>
+      </div>
+      <div class="ach-header__meta">
+        <div class="ach-counter">
+          <span class="ach-counter__val">{{ totalUnlocked() }}</span>
+          <span class="ach-counter__sep">/</span>
+          <span class="ach-counter__total">{{ TOTAL_ACHIEVEMENTS }}</span>
+        </div>
+        <span class="pixel-label">UNLOCKED</span>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="ach-progress-wrap">
+      <div class="ach-progress-bar"
+           [style.width.%]="(totalUnlocked() / TOTAL_ACHIEVEMENTS) * 100">
+      </div>
+    </div>
+
+    <!-- Category sections -->
+    @for (group of grouped(); track group.cat) {
+      <div class="ach-section" [style.animation-delay]="($index * 80) + 'ms'">
+
+        <!-- Section header -->
+        <div class="ach-section__header">
+          <span class="ach-section__icon">{{ categoryIcon(group.cat) }}</span>
+          <span class="ach-section__name">{{ group.cat }}</span>
+          <span class="ach-section__count">
+            {{ countUnlocked(group.cards) }} / {{ group.cards.length }}
+          </span>
+        </div>
+
+        <!-- Achievement cards grid -->
+        <div class="ach-grid">
+          @for (card of group.cards; track card.def.id) {
+            <div class="ach-card"
+                 [class.ach-card--locked]="!card.unlocked"
+                 [class]="'ach-card ach-card--' + card.def.rarity + (card.unlocked ? '' : ' ach-card--locked')"
+                 [style.border-color]="card.unlocked ? rarityBorderColor(card.def.rarity) + '66' : ''"
+                 [style.box-shadow]="card.unlocked ? rarityGlow(card.def.rarity) : 'none'">
+
+              <!-- Locked overlay icon -->
+              @if (!card.unlocked) {
+                <span class="ach-card__lock">&#128274;</span>
+              }
+
+              <!-- Icon -->
+              <div class="ach-card__icon" [class.ach-card__icon--locked]="!card.unlocked">
+                {{ card.def.icon }}
+              </div>
+
+              <!-- Rarity badge -->
+              <span class="ach-card__rarity"
+                    [style.color]="card.unlocked ? rarityBorderColor(card.def.rarity) : ''">
+                {{ RARITY_LABEL[card.def.rarity] }}
+              </span>
+
+              <!-- Name -->
+              <span class="ach-card__name" [class.ach-card__name--locked]="!card.unlocked">
+                {{ card.def.name }}
+              </span>
+
+              <!-- Description -->
+              <span class="ach-card__desc">{{ card.def.desc }}</span>
+
+              <!-- Earned by -->
+              <div class="ach-card__footer">
+                @if (card.unlocked) {
+                  <div class="ach-earners">
+                    @for (name of card.earnedBy; track name) {
+                      <span class="ach-earner-chip">{{ name }}</span>
+                    }
+                  </div>
+                } @else {
+                  <span class="ach-card__not-yet">NOT YET UNLOCKED</span>
+                }
+              </div>
+
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+  </div>
+}

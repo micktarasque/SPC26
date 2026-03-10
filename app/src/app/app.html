@@ -42,6 +42,58 @@
         </svg>
         <span class="nav-label">Results Table</span>
       </a>
+
+      <a class="nav-item"
+         routerLink="/race"
+         routerLinkActive="is-active"
+         (click)="closeSidebar()">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <path d="M2 12c2-4 5-6 8-6s6 2 8 6"/>
+          <path d="M2 12c2 4 5 6 8 6s6-2 8-6"/>
+          <circle cx="12" cy="12" r="2"/>
+        </svg>
+        <span class="nav-label">Horse Race</span>
+      </a>
+
+      <a class="nav-item"
+         routerLink="/players"
+         routerLinkActive="is-active"
+         (click)="closeSidebar()">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+          <circle cx="19" cy="9" r="2"/>
+          <path d="M19 15c-2 0-3 1-3 2v1"/>
+        </svg>
+        <span class="nav-label">Player Status</span>
+      </a>
+
+      <a class="nav-item"
+         routerLink="/achievements"
+         routerLinkActive="is-active"
+         (click)="closeSidebar()">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <path d="M8 21h8M12 17v4"/>
+          <path d="M7 4H4a1 1 0 0 0-1 1v2c0 3.3 2.7 6 6 6"/>
+          <path d="M17 4h3a1 1 0 0 1 1 1v2c0 3.3-2.7 6-6 6"/>
+          <path d="M12 13c-2.8 0-5-2.2-5-5V4h10v4c0 2.8-2.2 5-5 5z"/>
+        </svg>
+        <span class="nav-label">Achievements</span>
+      </a>
+
+      <a class="nav-item"
+         routerLink="/chart"
+         routerLinkActive="is-active"
+         (click)="closeSidebar()">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6"  y1="20" x2="6"  y2="14"/>
+          <line x1="2"  y1="20" x2="22" y2="20"/>
+          <path d="M2 14 l4 -4 l6 4 l6 -8"/>
+        </svg>
+        <span class="nav-label">Form Guide</span>
+      </a>
     </nav>
 
     <!-- Admin section -->
@@ -91,7 +143,7 @@
           <span class="auth-dot"></span>
           <span class="auth-label">Admin</span>
         </div>
-        <button class="nav-item nav-item--logout" (click)="auth.signOut()">
+        <button class="nav-item nav-item--logout" (click)="signOut()">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
             <polyline points="16 17 21 12 16 7"/>

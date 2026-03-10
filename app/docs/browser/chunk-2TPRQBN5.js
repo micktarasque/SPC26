@@ -1,1 +1,0 @@
-import{Fa as a,Va as n,Wa as c,db as o}from"./chunk-KVW3SSN5.js";var r=class t{static \u0275fac=function(e){return new(e||t)};static \u0275cmp=a({type:t,selectors:[["app-race"]],decls:2,vars:0,template:function(e,i){e&1&&(n(0,"p"),o(1,"race works!"),c())},encapsulation:2})};export{r as Race};

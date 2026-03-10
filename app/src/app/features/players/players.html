@@ -1,0 +1,252 @@
+<!-- Loading -->
+@if (loading()) {
+  <div class="state-screen">
+    <span class="pixel-title blink">LOADING...</span>
+  </div>
+}
+
+<!-- Error -->
+@if (error()) {
+  <div class="state-screen">
+    <span class="pixel-title error">&#9888; ERROR</span>
+    <p class="state-msg">{{ error() }}</p>
+  </div>
+}
+
+<!-- Player Status -->
+@if (!loading() && !error()) {
+  <div class="players-page">
+
+    <!-- Page Header -->
+    <div class="players-header">
+      <div>
+        <span class="pixel-label">SEASON 2026</span>
+        <h1 class="players-title">PLAYER STATUS</h1>
+      </div>
+      <div class="players-header__meta">
+        <span class="pixel-label">{{ players().length }} PLAYERS &middot; TAP TO EXPAND</span>
+      </div>
+    </div>
+
+    <!-- Player Cards — single column, rank order -->
+    @if (players().length === 0) {
+      <div class="empty-state">
+        <span class="pixel-label blink">&#9654; NO PLAYERS FOUND</span>
+      </div>
+    } @else {
+      <div class="players-list">
+        @for (p of players(); track p.user_id; let i = $index) {
+          <div class="player-card arcade-card"
+               [class.pc--rank-1]="p.rank === 1"
+               [class.pc--rank-2]="p.rank === 2"
+               [class.pc--rank-3]="p.rank === 3"
+               [class.pc--last]="p.rank === players().length && players().length > 1"
+               [class.pc--inactive]="!p.active"
+               [class.pc--expanded]="isExpanded(p.user_id)"
+               [style.animation-delay]="(i * 60) + 'ms'"
+               (click)="toggleExpand(p.user_id)">
+
+            <!-- ── MAIN ROW (always visible) ─────────────────────────── -->
+            <div class="pc-main">
+
+              <!-- Rank block -->
+              <div class="pc-rank pc-rank--{{ rankColor(p.rank) }}">
+                <span class="pc-rank__label">{{ rankLabel(p.rank) }}</span>
+                <span class="pc-rank__num">#{{ p.rank }}</span>
+              </div>
+
+              <!-- Identity + form -->
+              <div class="pc-identity">
+                <div class="pc-identity__row1">
+                  <span class="pc-name">{{ p.name }}</span>
+                  @if (p.title) {
+                    <span class="pc-title">{{ p.title }}</span>
+                  }
+                  <span class="pc-status-dot"
+                        [class.dot--active]="p.active"
+                        [class.dot--inactive]="!p.active"
+                        [title]="p.active ? 'Active' : 'Inactive'">
+                  </span>
+                </div>
+
+                <!-- Last 5 form pips -->
+                <div class="pc-form">
+                  <span class="pc-form__label">LAST 5</span>
+                  @for (gross of p.last5; track $index) {
+                    <span class="pc-pip"
+                          [class.pc-pip--win]="gross !== null && gross > 0"
+                          [class.pc-pip--loss]="gross !== null && gross <= 0"
+                          [class.pc-pip--null]="gross === null"
+                          [title]="gross !== null ? formatNet(gross) : 'no result'">
+                    </span>
+                  }
+                  @if (p.streak > 0) {
+                    <span class="pc-streak">{{ streakLabel(p) }}</span>
+                  }
+                </div>
+
+                <!-- Achievement badges -->
+                @if (p.achievements.length > 0) {
+                  <div class="pc-badges">
+                    @for (id of p.achievements; track id) {
+                      <span class="pc-badge"
+                            [class]="'pc-badge--' + getAchievement(id).rarity"
+                            [title]="getAchievement(id).name + ' · ' + getAchievement(id).desc">
+                        {{ getAchievement(id).icon }}
+                      </span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Key stats -->
+              <div class="pc-keystats">
+                <div class="pc-kstat">
+                  <span class="pc-kstat__label">NET</span>
+                  <span class="pc-kstat__val"
+                        [class.kv--pos]="(p.total_net ?? 0) > 0"
+                        [class.kv--neg]="(p.total_net ?? 0) < 0"
+                        [class.kv--null]="p.total_net === null">
+                    {{ formatNet(p.total_net) }}
+                  </span>
+                </div>
+                <div class="pc-kstat">
+                  <span class="pc-kstat__label">WIN%</span>
+                  <span class="pc-kstat__val" [style.color]="winRateColor(p.win_rate)">
+                    {{ p.win_rate !== null ? p.win_rate + '%' : '—' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Expand chevron -->
+              <div class="pc-chevron" [class.pc-chevron--open]="isExpanded(p.user_id)">&#9660;</div>
+
+            </div>
+
+            <!-- Net bar (leader = 100%) -->
+            @if (players()[0]?.total_net && (players()[0].total_net ?? 0) > 0) {
+              <div class="pc-bar-wrap">
+                <div class="pc-bar" [style.width.%]="netLeaderPct(p, players())"></div>
+              </div>
+            }
+
+            <!-- ── EXPANDED DETAILS ──────────────────────────────────── -->
+            @if (isExpanded(p.user_id)) {
+              <div class="pc-details">
+
+                <div class="pc-details__grid">
+
+                  <div class="pc-detail">
+                    <span class="pc-detail__icon">&#127942;</span>
+                    <span class="pc-detail__label">BEST ROUND</span>
+                    <span class="pc-detail__val pc-detail__val--win">
+                      {{ p.best_round !== null ? '+' + p.best_round : '—' }}
+                    </span>
+                  </div>
+
+                  <div class="pc-detail">
+                    <span class="pc-detail__icon">&#128128;</span>
+                    <span class="pc-detail__label">WORST ROUND</span>
+                    <span class="pc-detail__val pc-detail__val--loss">
+                      {{ p.worst_round !== null ? formatNet(p.worst_round) : '—' }}
+                    </span>
+                  </div>
+
+                  <div class="pc-detail">
+                    <span class="pc-detail__icon">&#128200;</span>
+                    <span class="pc-detail__label">AVG / ROUND</span>
+                    <span class="pc-detail__val" [style.color]="avgColor(p.avg_gross)">
+                      {{ formatAvg(p.avg_gross) }}
+                    </span>
+                  </div>
+
+                  <div class="pc-detail">
+                    <span class="pc-detail__icon">&#128683;</span>
+                    <span class="pc-detail__label">MISSED</span>
+                    <span class="pc-detail__val"
+                          [class.pc-detail__val--warn]="p.missed_rounds >= 4"
+                          [class.pc-detail__val--neutral]="p.missed_rounds < 4">
+                      {{ p.missed_rounds }} / {{ TOTAL_ROUNDS }}
+                    </span>
+                  </div>
+
+                  <div class="pc-detail">
+                    <span class="pc-detail__icon">{{ p.streak_type === 'win' ? '&#128293;' : '&#10052;' }}</span>
+                    <span class="pc-detail__label">STREAK</span>
+                    <span class="pc-detail__val"
+                          [class.pc-detail__val--win]="p.streak_type === 'win' && p.streak > 0"
+                          [class.pc-detail__val--loss]="p.streak_type === 'loss' && p.streak > 0"
+                          [class.pc-detail__val--neutral]="p.streak === 0">
+                      {{ streakLabel(p) }}
+                    </span>
+                  </div>
+
+                  <div class="pc-detail">
+                    <span class="pc-detail__icon">&#9889;</span>
+                    <span class="pc-detail__label">BONUS ×2</span>
+                    <span class="pc-detail__val"
+                          [class.pc-detail__val--gold]="p.multiplier_count > 0"
+                          [class.pc-detail__val--neutral]="p.multiplier_count === 0">
+                      {{ p.multiplier_count > 0 ? p.multiplier_count + '&times;' : '—' }}
+                    </span>
+                  </div>
+
+                </div>
+
+                <!-- Achievements (expanded) -->
+                @if (p.achievements.length > 0) {
+                  <div class="pc-achievements">
+                    <span class="pc-achievements__label">ACHIEVEMENTS UNLOCKED</span>
+                    <div class="pc-achievements__list">
+                      @for (id of p.achievements; track id) {
+                        <div class="pc-ach" [class]="'pc-ach--' + getAchievement(id).rarity">
+                          <span class="pc-ach__icon">{{ getAchievement(id).icon }}</span>
+                          <div class="pc-ach__text">
+                            <span class="pc-ach__name">{{ getAchievement(id).name }}</span>
+                            <span class="pc-ach__desc">{{ getAchievement(id).desc }}</span>
+                          </div>
+                          <span class="pc-ach__rarity">{{ getAchievement(id).rarity.toUpperCase() }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Footer totals -->
+                <div class="pc-details__footer">
+                  <div class="pc-total">
+                    <span class="pc-total__label">GROSS TOTAL</span>
+                    <span class="pc-total__val"
+                          [class.kv--pos]="(p.total_gross ?? 0) > 0"
+                          [class.kv--neg]="(p.total_gross ?? 0) < 0"
+                          [class.kv--null]="p.total_gross === null">
+                      {{ formatNet(p.total_gross) }}
+                    </span>
+                  </div>
+                  <div class="pc-total">
+                    <span class="pc-total__label">NET TOTAL</span>
+                    <span class="pc-total__val"
+                          [class.kv--pos]="(p.total_net ?? 0) > 0"
+                          [class.kv--neg]="(p.total_net ?? 0) < 0"
+                          [class.kv--null]="p.total_net === null">
+                      {{ formatNet(p.total_net) }}
+                    </span>
+                  </div>
+                  <div class="pc-total">
+                    <span class="pc-total__label">ROUNDS PLAYED</span>
+                    <span class="pc-total__val pc-total__val--neutral">
+                      {{ p.total_bets }} / {{ TOTAL_ROUNDS }}
+                    </span>
+                  </div>
+                </div>
+
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+}

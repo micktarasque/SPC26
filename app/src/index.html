@@ -9,6 +9,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    // Restore Angular route from GitHub Pages 404 redirect query param.
+    (function (l) {
+      if (l.search[1] === 'p' && l.search.indexOf('p=/') === 1) {
+        var params = l.search.slice(1).split('&');
+        var path = '';
+        var query = '';
+        for (var i = 0; i < params.length; i++) {
+          if (params[i].indexOf('p=') === 0) path = '/' + params[i].slice(2).replace(/~and~/g, '&');
+          if (params[i].indexOf('q=') === 0) query = '?' + params[i].slice(2).replace(/~and~/g, '&');
+        }
+        if (path) {
+          window.history.replaceState(null, null, l.pathname.slice(0, -1) + path + query + l.hash);
+        }
+      }
+    }(window.location));
+  </script>
 </head>
 <body>
   <app-root></app-root>

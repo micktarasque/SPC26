@@ -1,0 +1,139 @@
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 2rem 1rem;
+  animation: float-up 0.4s ease both;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+
+  &__header {
+    text-align: center;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.75rem;
+    color: var(--color-accent);
+    text-shadow: 0 0 20px var(--color-accent);
+    margin: 0.5rem 0 0;
+    letter-spacing: 0.1em;
+    animation: flicker 8s infinite;
+  }
+
+  &__subtitle {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    color: var(--color-muted);
+    letter-spacing: 0.2em;
+    margin: 0;
+  }
+
+  &__error {
+    background: rgba(255, 59, 59, 0.12);
+    border: 1px solid var(--color-loss);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+
+    .pixel-label {
+      color: var(--color-loss);
+      font-size: 0.55rem;
+    }
+  }
+
+  &__footer {
+    margin-top: 1.5rem;
+    text-align: center;
+
+    .pixel-label {
+      font-size: 0.45rem;
+      color: var(--color-muted);
+      opacity: 0.6;
+    }
+  }
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__label {
+    font-size: 0.55rem;
+    color: var(--color-cyan);
+  }
+
+  &__input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+
+    &::placeholder {
+      color: var(--color-muted);
+      opacity: 0.5;
+    }
+
+    &:focus {
+      border-color: var(--color-cyan);
+      box-shadow: 0 0 8px rgba(0, 245, 255, 0.25);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__submit {
+    width: 100%;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    padding: 0.875rem 1rem;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+}
+
+// Mobile
+@media (max-width: 767px) {
+  .login-page {
+    padding: 1rem;
+    align-items: flex-start;
+    padding-top: 3rem;
+  }
+
+  .login-card {
+    &__title {
+      font-size: 1.25rem;
+    }
+  }
+}

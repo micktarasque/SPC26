@@ -1,0 +1,501 @@
+// ─── Page Layout ───────────────────────────────────────────────────────────────
+
+.race-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  animation: float-up 0.4s ease both;
+}
+
+// ─── Typography helpers ─────────────────────────────────────────────────────────
+
+.pixel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+
+  &.blink { animation: blink 1s step-end infinite; }
+  &.error { color: var(--color-loss); }
+}
+
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+
+  &.blink { animation: blink 1.2s step-end infinite; }
+}
+
+// ─── State Screens ──────────────────────────────────────────────────────────────
+
+.state-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 40vh;
+}
+
+.state-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.empty-state {
+  padding: 40px 0;
+  text-align: center;
+}
+
+// ─── Page Header ───────────────────────────────────────────────────────────────
+
+.race-header {
+  border-color: rgba(255, 0, 168, 0.4);
+  flex-shrink: 0;
+
+  &__inner {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  &__icon { font-size: 2.4rem; line-height: 1; }
+
+  &__text {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
+    color: var(--color-accent);
+    text-shadow: 0 0 20px rgba(255, 0, 168, 0.55);
+    letter-spacing: 0.06em;
+    margin: 0;
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  &__season {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+}
+
+// ─── Desktop / Mobile visibility ───────────────────────────────────────────────
+
+.race-desktop { display: block; }
+.race-mobile  { display: none; }
+
+@media (max-width: 767px) {
+  .race-desktop { display: none; }
+  .race-mobile  { display: block; }
+}
+
+// ─── Desktop: Track Container ──────────────────────────────────────────────────
+
+.race-desktop {
+  border-color: rgba(0, 245, 255, 0.3);
+
+  .arcade-card-inner {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+// Distance header row (labels above lanes)
+.track-header {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  margin-bottom: 4px;
+
+  @media (max-width: 1024px) { grid-template-columns: 140px 1fr; }
+
+  &__spacer { /* empty label-column spacer */ }
+
+  &__road {
+    position: relative;
+    height: 28px;
+  }
+}
+
+.dist-label {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--color-muted);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  pointer-events: none;
+
+  &--edge      { left: 0 !important; transform: translateY(-50%); }
+  &--end.dist-label--edge { left: auto !important; right: 0; }
+}
+
+// Lane rows
+.lanes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lane {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+
+  @media (max-width: 1024px) { grid-template-columns: 140px 1fr; }
+
+  &:hover {
+    background: rgba(0, 245, 255, 0.03);
+    border-color: rgba(0, 245, 255, 0.1);
+  }
+
+  &--leader {
+    background: rgba(255, 0, 168, 0.05);
+    border-color: rgba(255, 0, 168, 0.2) !important;
+  }
+
+  &--last .lane__name { color: var(--color-muted); }
+}
+
+.lane__info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 8px 0;
+  min-width: 0;
+}
+
+.lane__rank {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  flex-shrink: 0;
+  min-width: 20px;
+  text-align: center;
+
+  &[data-color="gold"]   { color: var(--color-gold);   text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+  &[data-color="silver"] { color: var(--color-silver); }
+  &[data-color="bronze"] { color: var(--color-bronze); }
+  &[data-color="default"]{ color: var(--color-muted);  }
+}
+
+.lane__name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.07em;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+
+  .lane--leader & {
+    color: var(--color-accent);
+    text-shadow: 0 0 10px rgba(255, 0, 168, 0.4);
+  }
+}
+
+.lane__score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 44px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+// Track road
+.lane__road {
+  position: relative;
+  height: 56px;
+  overflow: visible;
+}
+
+.lane__marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(42, 24, 80, 0.6);
+  pointer-events: none;
+
+  &--finish {
+    right: 0;
+    left: auto;
+    background: rgba(0, 245, 255, 0.35);
+  }
+}
+
+// Horse on desktop
+.lane__horse {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  transition: left 0.8s ease;
+  z-index: 2;
+}
+
+.horse__body {
+  font-size: 1.6rem;
+  line-height: 1;
+  display: block;
+}
+
+.horse__crown {
+  font-size: 1rem;
+  line-height: 1;
+  text-align: center;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.horse__label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--color-cyan);
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
+  text-align: center;
+  line-height: 1;
+}
+
+// Dust cloud (desktop — trails behind horse to the left)
+.horse__dust {
+  position: absolute;
+  right: calc(100% - 8px);
+  top: 50%;
+  transform: translateY(-40%);
+  width: 56px;
+  height: 32px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+// Finish bar annotation
+.finish-bar {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  margin-top: 6px;
+
+  @media (max-width: 1024px) { grid-template-columns: 140px 1fr; }
+
+  &__spacer { /* empty */ }
+
+  &__flag {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.55rem;
+    color: var(--color-cyan);
+    letter-spacing: 0.1em;
+    text-align: right;
+    padding-right: 4px;
+    text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+  }
+}
+
+// ─── Dust Cloud SVG Animation ───────────────────────────────────────────────────
+
+@keyframes dust-rise {
+  0%   { opacity: 0.75; transform: scale(0.4) translateX(12px); }
+  100% { opacity: 0;    transform: scale(1.8) translateX(-8px); }
+}
+
+.dust-c {
+  fill: rgba(90, 62, 122, 0.7);
+  filter: blur(2px);
+
+  &--1 { animation: dust-rise 1.5s ease-out infinite; }
+  &--2 { animation: dust-rise 1.5s ease-out 0.4s infinite; }
+  &--3 { animation: dust-rise 1.5s ease-out 0.8s infinite; }
+}
+
+// ─── Mobile: Vertical Track ────────────────────────────────────────────────────
+
+.race-mobile {
+  border-color: rgba(0, 245, 255, 0.3);
+
+  .arcade-card-inner {
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+.vtrack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  &__finish-label { color: var(--color-win); text-align: center; }
+  &__start-label  { color: var(--color-muted); text-align: center; }
+
+  &__road {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 245, 255, 0.05),
+      rgba(42, 24, 80, 0.12),
+      rgba(255, 0, 168, 0.04)
+    );
+    border-left:  1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    overflow: visible;
+  }
+
+  &__marker {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(42, 24, 80, 0.7);
+    pointer-events: none;
+
+    &-label {
+      position: absolute;
+      right: 4px;
+      top: 3px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      color: var(--color-muted);
+      letter-spacing: 0.08em;
+    }
+  }
+
+  &__horse {
+    position: absolute;
+    transform: translate(-50%, 50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    transition: bottom 0.8s ease;
+    z-index: 2;
+  }
+
+  &__horse-emoji {
+    font-size: 1.4rem;
+    line-height: 1;
+    display: block;
+  }
+
+  &__horse-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    color: var(--color-cyan);
+    white-space: nowrap;
+    text-align: center;
+    line-height: 1;
+  }
+}
+
+.horse__crown--v {
+  font-size: 0.9rem;
+  line-height: 1;
+  text-align: center;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+// Dust on mobile — trails below horse (descending direction)
+.horse__dust--v {
+  position: absolute;
+  top: calc(100% - 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 56px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+// ─── Mobile Score List ──────────────────────────────────────────────────────────
+
+.mobile-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+}
+
+.mscore {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+
+  &--leader {
+    background: rgba(255, 0, 168, 0.05);
+    border-color: rgba(255, 0, 168, 0.2);
+  }
+
+  &__rank {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    text-align: center;
+
+    &[data-color="gold"]   { color: var(--color-gold);   }
+    &[data-color="silver"] { color: var(--color-silver); }
+    &[data-color="bronze"] { color: var(--color-bronze); }
+    &[data-color="default"]{ color: var(--color-muted);  }
+  }
+
+  &__name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.07em;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+}
+
+// ─── Score colour helpers ───────────────────────────────────────────────────────
+
+.score-positive { color: var(--color-win);   text-shadow: 0 0 6px rgba(57, 255, 20, 0.4); }
+.score-negative { color: var(--color-loss);  text-shadow: 0 0 6px rgba(255, 59, 59, 0.4); }
+.score-null     { color: var(--color-muted) !important; text-shadow: none !important; }

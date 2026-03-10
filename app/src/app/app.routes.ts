@@ -15,6 +15,18 @@ export const routes: Routes = [
     loadComponent: () => import('./features/race/race').then(m => m.Race)
   },
   {
+    path: 'players',
+    loadComponent: () => import('./features/players/players').then(m => m.Players)
+  },
+  {
+    path: 'chart',
+    loadComponent: () => import('./features/chart/chart').then(m => m.Chart)
+  },
+  {
+    path: 'achievements',
+    loadComponent: () => import('./features/achievements/achievements').then(m => m.Achievements)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/login/login').then(m => m.Login)
   },

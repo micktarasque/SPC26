@@ -1,4 +1,166 @@
-<div class="page-placeholder">
-  <h1>Bet Results</h1>
-  <p>Score entry coming soon.</p>
+<!-- Loading -->
+@if (loading()) {
+  <div class="state-screen">
+    <span class="pixel-title blink">LOADING...</span>
+  </div>
+}
+
+<!-- Error -->
+@if (error()) {
+  <div class="state-screen">
+    <span class="pixel-title error">&#x26A0; ERROR</span>
+    <p class="state-msg">{{ error() }}</p>
+  </div>
+}
+
+<!-- ═══ STEP 1: ROUND PICKER ═══ -->
+@if (!loading() && !error() && !selectedRound()) {
+<div class="bets-page">
+
+  <div class="page-header arcade-card glow-pink">
+    <div class="arcade-card-inner page-header__inner">
+      <div>
+        <span class="pixel-label">ADMIN</span>
+        <h1 class="page-title">SCORE ENTRY</h1>
+      </div>
+      <span class="pixel-label">SELECT A ROUND</span>
+    </div>
+  </div>
+
+  <div class="round-picker arcade-card glow-cyan">
+    <div class="arcade-card-inner">
+      <span class="pixel-title round-picker__title">SEASON 2026</span>
+
+      @if (schedule().length === 0) {
+        <div class="empty-state">
+          <span class="pixel-label blink">&#x25B6; NO ROUNDS FOUND</span>
+        </div>
+      } @else {
+        <div class="round-grid">
+          @for (round of schedule(); track round.id) {
+            <button class="round-card" (click)="selectRound(round)">
+              <span class="round-card__num">{{ round.round_number < 10 ? '0' + round.round_number : round.round_number }}</span>
+              <span class="round-card__date">{{ formatDate(round.round_date) }}</span>
+              <span class="round-card__sport">{{ round.special_event ?? round.sport ?? 'TBA' }}</span>
+              @if (isBonus(round)) {
+                <span class="round-card__bonus">&#x26A1;&#xD7;2</span>
+              }
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
 </div>
+}
+
+<!-- ═══ STEP 2: SCORE ENTRY ═══ -->
+@if (!loading() && !error() && selectedRound()) {
+<div class="bets-page">
+
+  <!-- Header -->
+  <div class="page-header arcade-card glow-pink">
+    <div class="arcade-card-inner page-header__inner">
+      <div class="page-header__left">
+        <button class="btn-ghost back-btn" (click)="backToRounds()">&#x2190; ROUNDS</button>
+        <div>
+          <span class="pixel-label">ROUND {{ selectedRound()!.round_number }}</span>
+          <h1 class="page-title">{{ selectedRound()!.special_event ?? selectedRound()!.sport ?? 'TBA' }}</h1>
+          <span class="round-date">{{ formatDate(selectedRound()!.round_date) }}</span>
+        </div>
+      </div>
+      @if (isBonus(selectedRound()!)) {
+        <span class="bonus-badge">&#x26A1; BONUS &#xD7;2</span>
+      }
+    </div>
+  </div>
+
+  <!-- Score Entry Panel -->
+  <div class="score-panel arcade-card glow-cyan">
+    <div class="arcade-card-inner">
+
+      @if (loadingScores()) {
+        <div class="state-screen">
+          <span class="pixel-title blink">LOADING...</span>
+        </div>
+      } @else if (scoresError()) {
+        <div class="state-screen">
+          <span class="pixel-title error">&#x26A0; ERROR</span>
+          <p class="state-msg">{{ scoresError() }}</p>
+        </div>
+      } @else if (rows().length === 0) {
+        <div class="empty-state">
+          <span class="pixel-label blink">&#x25B6; NO ACTIVE PLAYERS</span>
+        </div>
+      } @else {
+
+        <!-- Table header -->
+        <div class="score-table-header">
+          <span class="pixel-label col-name">PLAYER</span>
+          <span class="pixel-label col-gross">GROSS</span>
+          <span class="pixel-label col-multi">&#x26A1;&#xD7;2</span>
+          <span class="pixel-label col-status">STATUS</span>
+        </div>
+
+        <!-- Score rows -->
+        @for (row of rows(); track row.user.id) {
+          <div class="score-row"
+            [class.score-row--saved]="row.saved"
+            [class.score-row--pending]="row.pending"
+            [class.score-row--error]="!!row.saveError">
+
+            <span class="score-row__name">{{ row.user.name }}</span>
+
+            <div class="score-row__gross col-gross">
+              <input
+                class="gross-input"
+                type="number"
+                step="1"
+                placeholder="—"
+                [ngModel]="row.gross"
+                (ngModelChange)="onGrossChange(row, $event)"
+                (blur)="onBlur(row)"
+                [disabled]="row.saving"
+              />
+            </div>
+
+            <div class="score-row__multi col-multi">
+              <label class="multi-toggle" [class.multi-toggle--on]="row.applyMultiplier">
+                <input
+                  type="checkbox"
+                  [ngModel]="row.applyMultiplier"
+                  (ngModelChange)="row.applyMultiplier = $event; onMultiplierChange(row)"
+                  [disabled]="row.saving"
+                />
+                <span class="multi-toggle__label">{{ row.applyMultiplier ? 'ON' : 'OFF' }}</span>
+              </label>
+            </div>
+
+            <div class="score-row__status col-status">
+              @if (row.saving) {
+                <span class="pixel-label saving-label blink">SAVING</span>
+              } @else if (row.saved) {
+                <span class="pixel-label saved-label">&#x2713; SAVED</span>
+              } @else if (row.pending) {
+                <span class="pixel-label pending-label blink">&#x2026;</span>
+              } @else if (row.saveError) {
+                <span class="row-error">{{ row.saveError }}</span>
+              } @else if (hasGross(row)) {
+                <button
+                  class="btn-ghost action-btn action-btn--del"
+                  (click)="deleteRow(row)"
+                  title="Clear result"
+                >CLR</button>
+              }
+            </div>
+
+          </div>
+        }
+
+      }
+    </div>
+  </div>
+
+</div>
+}
