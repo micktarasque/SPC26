@@ -168,5 +168,141 @@
       <span class="key-label key-label--hint">CLICK LEGEND TO TOGGLE PLAYER</span>
     </div>
 
+    <!-- ── Team Investment Tracker ──────────────────────────────────────────── -->
+    @if (teamChart(); as tc) {
+      <div class="team-section">
+
+        <!-- Section header -->
+        <div class="chart-header">
+          <div>
+            <span class="pixel-label">{{ series().length }} PLAYERS &middot; ${{ INVESTMENT_PER_PLAYER }} EACH</span>
+            <h2 class="chart-title">INVESTMENT TRACKER</h2>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="team-stats">
+          <div class="team-stat">
+            <span class="team-stat__label">TOTAL INVESTED</span>
+            <span class="team-stat__val">${{ tc.totalInvestment }}</span>
+          </div>
+          <div class="team-stat">
+            <span class="team-stat__label">TARGET AT R{{ tc.lastPlayed }}</span>
+            <span class="team-stat__val">${{ tc.currentBreakeven }}</span>
+          </div>
+          <div class="team-stat">
+            <span class="team-stat__label">TEAM RETURNS</span>
+            <span class="team-stat__val" [class.team-stat__val--win]="tc.lastCum > 0" [class.team-stat__val--loss]="tc.lastCum < 0">
+              ${{ tc.lastCum }}
+            </span>
+          </div>
+          <div class="team-stat" [class.team-stat--ahead]="tc.isAhead" [class.team-stat--behind]="!tc.isAhead">
+            <span class="team-stat__label">{{ tc.isAhead ? '▲ SURPLUS' : '▼ DEFICIT' }}</span>
+            <span class="team-stat__val">{{ formatSurplus(tc) }}</span>
+          </div>
+          <div class="team-stat">
+            <span class="team-stat__label">% RECOVERED</span>
+            <span class="team-stat__val" [class.team-stat__val--win]="tc.pctRecovered >= 100" [class.team-stat__val--loss]="tc.pctRecovered < 0">
+              {{ tc.pctRecovered }}%
+            </span>
+          </div>
+        </div>
+
+        <!-- SVG Chart -->
+        <div class="chart-wrap arcade-card">
+          <svg [attr.viewBox]="TVB" class="chart-svg team-chart-svg" preserveAspectRatio="xMidYMid meet" role="img">
+
+            <!-- Horizontal grid lines -->
+            @for (t of tc.yTicks; track t.label) {
+              <line
+                [attr.x1]="TMCHARTX" [attr.x2]="TMCHARTX + TMCW"
+                [attr.y1]="t.y"      [attr.y2]="t.y"
+                class="grid-line"/>
+            }
+
+            <!-- Zero line -->
+            <line
+              [attr.x1]="TMCHARTX" [attr.x2]="TMCHARTX + TMCW"
+              [attr.y1]="tc.y0"    [attr.y2]="tc.y0"
+              class="zero-line"/>
+
+            <!-- Fill area between actual and breakeven -->
+            <path
+              [attr.d]="tc.fillPath"
+              [attr.fill]="tc.isAhead ? 'rgba(57,255,20,0.07)' : 'rgba(255,59,59,0.07)'"
+              stroke="none"/>
+
+            <!-- Breakeven target line (dashed gold) -->
+            <path
+              [attr.d]="tc.breakevenPath"
+              stroke="#FFD700"
+              stroke-opacity="0.65"
+              stroke-width="1.8"
+              stroke-dasharray="8,5"
+              fill="none"
+              stroke-linejoin="round"
+              stroke-linecap="round"/>
+
+            <!-- Actual team returns line (solid cyan) -->
+            <path
+              [attr.d]="tc.actualPath"
+              stroke="#00F5FF"
+              stroke-opacity="0.9"
+              stroke-width="2.5"
+              fill="none"
+              stroke-linejoin="round"
+              stroke-linecap="round"/>
+
+            <!-- Y-axis labels -->
+            @for (t of tc.yTicks; track t.label) {
+              <text
+                [attr.x]="TMCHARTX - 10" [attr.y]="t.y + 5"
+                text-anchor="end" class="axis-lbl">{{ t.label }}</text>
+            }
+
+            <!-- X-axis labels -->
+            @for (xl of tc.xLabels; track xl.label) {
+              <text
+                [attr.x]="xl.x" [attr.y]="TMCHARTY + TMCH + 24"
+                text-anchor="middle" class="axis-lbl">{{ xl.label }}</text>
+            }
+
+            <!-- Chart border lines -->
+            <line
+              [attr.x1]="TMCHARTX" [attr.x2]="TMCHARTX"
+              [attr.y1]="TMCHARTY" [attr.y2]="TMCHARTY + TMCH"
+              class="axis-line"/>
+            <line
+              [attr.x1]="TMCHARTX" [attr.x2]="TMCHARTX + TMCW"
+              [attr.y1]="TMCHARTY + TMCH" [attr.y2]="TMCHARTY + TMCH"
+              class="axis-line"/>
+
+            <!-- Y axis label -->
+            <text x="28" [attr.y]="TMCHARTY + 4" class="area-label" text-anchor="middle" [attr.transform]="'rotate(-90 28 ' + (TMCHARTY + TMCH/2) + ')'">
+              GROSS RETURN ($)
+            </text>
+
+          </svg>
+        </div>
+
+        <!-- Key -->
+        <div class="chart-key">
+          <div class="key-item">
+            <svg width="32" height="12" class="key-svg">
+              <line x1="0" y1="6" x2="32" y2="6" stroke="#00F5FF" stroke-width="2.5"/>
+            </svg>
+            <span class="key-label">TEAM RETURNS</span>
+          </div>
+          <div class="key-item">
+            <svg width="32" height="12" class="key-svg">
+              <line x1="0" y1="6" x2="32" y2="6" stroke="#FFD700" stroke-opacity="0.65" stroke-width="1.8" stroke-dasharray="8,5"/>
+            </svg>
+            <span class="key-label">BREAKEVEN TARGET</span>
+          </div>
+        </div>
+
+      </div>
+    }
+
   </div>
 }

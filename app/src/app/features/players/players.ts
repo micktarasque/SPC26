@@ -61,6 +61,11 @@ export class Players implements OnInit {
         users.map((u: User) => [u.id, u.active])
       );
 
+      // Highest round number where any score has been entered (null = not yet played)
+      const roundsElapsed = roundScores
+        .filter(s => s.gross !== null)
+        .reduce((max, s) => Math.max(max, s.round_number), 0);
+
       const cards: PlayerCard[] = leaderboard.map((entry, i) => {
         const scores = roundScores
           .filter(s => s.user_id === entry.user_id && s.gross !== null)
@@ -128,7 +133,7 @@ export class Players implements OnInit {
           best_round:    grossValues.length > 0 ? Math.max(...grossValues) : null,
           worst_round:   grossValues.length > 0 ? Math.min(...grossValues) : null,
           avg_gross,
-          missed_rounds: this.TOTAL_ROUNDS - entry.total_bets,
+          missed_rounds: roundsElapsed - entry.total_bets,
           streak,
           streak_type,
           maxWinStreak,
@@ -160,6 +165,7 @@ export class Players implements OnInit {
           total_net:        p.total_net,
           total_bets:       p.total_bets,
           missed_rounds:    p.missed_rounds,
+          roundsElapsed:    roundsElapsed,
           totalRounds:      this.TOTAL_ROUNDS,
           streak:           p.streak,
           streak_type:      p.streak_type,

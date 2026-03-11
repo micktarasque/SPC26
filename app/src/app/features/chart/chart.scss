@@ -305,3 +305,86 @@
     display: none;
   }
 }
+
+// ─── Team Investment Section ──────────────────────────────────────────────────
+
+.team-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(42, 24, 80, 0.8);
+}
+
+// ─── Team Stats Row ───────────────────────────────────────────────────────────
+
+.team-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.team-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  background: rgba(13, 10, 26, 0.8);
+  border: 1px solid rgba(42, 24, 80, 0.8);
+  border-radius: 6px;
+  flex: 1;
+  min-width: 100px;
+
+  &--ahead {
+    border-color: rgba(57, 255, 20, 0.35);
+    background: rgba(57, 255, 20, 0.05);
+  }
+
+  &--behind {
+    border-color: rgba(255, 59, 59, 0.35);
+    background: rgba(255, 59, 59, 0.05);
+  }
+
+  @media (max-width: 480px) {
+    padding: 8px 10px;
+    min-width: 80px;
+  }
+}
+
+.team-stat__label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.38rem;
+  letter-spacing: 0.08em;
+  color: rgba(180, 150, 220, 0.55);
+  white-space: nowrap;
+
+  @media (max-width: 480px) {
+    font-size: 0.34rem;
+  }
+}
+
+.team-stat__val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  line-height: 1;
+
+  &--win  { color: var(--color-win); text-shadow: 0 0 12px rgba(57, 255, 20, 0.4); }
+  &--loss { color: var(--color-loss); }
+
+  @media (max-width: 480px) {
+    font-size: 1.1rem;
+  }
+}
+
+// Resize the team chart SVG (shorter height)
+.team-chart-svg {
+  min-width: 640px;
+
+  @media (max-width: 767px) {
+    min-width: 700px;
+    width: 700px;
+  }
+}

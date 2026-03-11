@@ -62,6 +62,11 @@ export class Achievements implements OnInit {
 
       const total = leaderboard.length;
 
+      // Highest round number where any score has been entered
+      const roundsElapsed = roundScores
+        .filter(s => s.gross !== null)
+        .reduce((max, s) => Math.max(max, s.round_number), 0);
+
       // Build per-player AchievementStats
       const playerStats: { name: string; stats: AchievementStats }[] = leaderboard.map((entry, i) => {
         const scores = roundScores
@@ -116,7 +121,8 @@ export class Achievements implements OnInit {
             win_rate,
             total_net:        entry.total_net,
             total_bets:       entry.total_bets,
-            missed_rounds:    this.TOTAL_ROUNDS - entry.total_bets,
+            missed_rounds:    roundsElapsed - entry.total_bets,
+            roundsElapsed:    roundsElapsed,
             totalRounds:      this.TOTAL_ROUNDS,
             streak:           currentStreak,
             streak_type,

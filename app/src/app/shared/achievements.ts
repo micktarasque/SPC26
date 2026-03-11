@@ -11,30 +11,31 @@ export interface AchievementDef {
 }
 
 export interface AchievementStats {
-  rank:           number;
-  totalPlayers:   number;
-  win_rate:       number | null;
-  total_net:      number | null;
-  total_bets:     number;
-  missed_rounds:  number;
-  totalRounds:    number;
-  streak:         number;
-  streak_type:    'win' | 'loss';
-  maxWinStreak:   number;
-  maxLossStreak:  number;
+  rank:             number;
+  totalPlayers:     number;
+  win_rate:         number | null;
+  total_net:        number | null;
+  total_bets:       number;
+  missed_rounds:    number;   // roundsElapsed - total_bets
+  roundsElapsed:    number;   // highest round with any entered score
+  totalRounds:      number;
+  streak:           number;
+  streak_type:      'win' | 'loss';
+  maxWinStreak:     number;
+  maxLossStreak:    number;
   multiplier_count: number;
-  best_round:     number | null;
-  worst_round:    number | null;
-  compBestRound:  number | null;
-  compWorstRound: number | null;
-  slumpBuster:    boolean;
+  best_round:       number | null;
+  worst_round:      number | null;
+  compBestRound:    number | null;
+  compWorstRound:   number | null;
+  slumpBuster:      boolean;
 }
 
 export function checkAchievement(id: string, s: AchievementStats): boolean {
   switch (id) {
     case 'champion':       return s.rank === 1;
     case 'podium':         return s.rank <= 3;
-    case 'sharpshooter':   return (s.win_rate ?? 0) >= 70;
+    case 'sharpshooter':   return (s.win_rate ?? 0) >= 70 && s.total_bets >= 5;
     case 'big_winner':     return s.best_round !== null && s.compBestRound !== null
                                && s.best_round >= s.compBestRound;
     case 'hat_trick':      return s.maxWinStreak >= 3;
@@ -42,7 +43,7 @@ export function checkAchievement(id: string, s: AchievementStats): boolean {
     case 'inferno':        return s.maxWinStreak >= 6;
     case 'bonus_hunter':   return s.multiplier_count >= 3;
     case 'all_in':         return s.multiplier_count >= 5;
-    case 'iron_man':       return s.missed_rounds === 0 && s.total_bets >= 10;
+    case 'iron_man':       return s.missed_rounds === 0 && s.roundsElapsed >= 5;
     case 'committed':      return s.total_bets >= 20;
     case 'participation':  return s.total_bets >= 1;
     case 'wooden_spoon':   return s.rank === s.totalPlayers && s.totalPlayers > 1;
