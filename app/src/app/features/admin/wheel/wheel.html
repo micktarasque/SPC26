@@ -1,0 +1,214 @@
+<!-- Loading -->
+@if (loading()) {
+  <div class="state-screen">
+    <span class="pixel-title blink">LOADING...</span>
+  </div>
+}
+
+<!-- Error -->
+@if (error()) {
+  <div class="state-screen">
+    <span class="pixel-title error">&#9888; ERROR</span>
+    <p class="state-msg">{{ error() }}</p>
+  </div>
+}
+
+<!-- ══ Share / Screenshot overlay ══ -->
+@if (shareMode() && result()) {
+  <div class="share-overlay" (click)="toggleShareMode()">
+    <div class="share-card" (click)="$event.stopPropagation()">
+      <div class="share-card__brand">
+        <span class="share-card__logo">SPC26</span>
+        <span class="share-card__sub">TIPBOARD · SEASON 2026</span>
+      </div>
+      <div class="share-card__divider"></div>
+      <span class="share-card__label">&#127921; THIS WEEK'S SPORT</span>
+      <div class="share-card__sport" [style.color]="result()!.color" [style.text-shadow]="'0 0 30px ' + result()!.color + '88'">
+        {{ result()!.sport }}
+      </div>
+      <div class="share-card__multi" [style.color]="result()!.color">
+        ×{{ result()!.multiplier.toFixed(1) }} MULTIPLIER
+      </div>
+      @if (targetRound()) {
+        <div class="share-card__round">
+          ROUND {{ targetRound()!.round_number }} &middot; {{ formatDate(targetRound()!.round_date) }}
+        </div>
+      }
+      <div class="share-card__divider"></div>
+      <p class="share-card__hint">BET ON {{ result()!.sport.toUpperCase() }} FOR ×{{ result()!.multiplier.toFixed(1) }} RETURNS</p>
+      <button class="btn-ghost share-close-btn" (click)="toggleShareMode()">&#10005; CLOSE</button>
+    </div>
+  </div>
+}
+
+<!-- ══ Config editor ══ -->
+@if (editMode()) {
+  <div class="config-overlay">
+    <div class="config-panel arcade-card">
+      <div class="arcade-card-inner">
+        <div class="config-header">
+          <span class="pixel-title">EDIT WHEEL SPORTS</span>
+          <button class="btn-ghost config-reset" (click)="resetDefaults()">RESET DEFAULTS</button>
+        </div>
+        <div class="config-list">
+          @for (slot of editSlotsArr; track $index) {
+            <div class="config-row">
+              <span class="config-swatch" [style.background]="slot.color"></span>
+              <input
+                class="config-input config-input--sport"
+                type="text"
+                placeholder="Sport name"
+                [(ngModel)]="slot.sport"
+              />
+              <input
+                class="config-input config-input--multi"
+                type="number"
+                step="0.5"
+                min="1.0"
+                max="3.0"
+                [(ngModel)]="slot.multiplier"
+              />
+              <span class="config-multi-badge">×{{ slot.multiplier.toFixed(1) }}</span>
+            </div>
+          }
+        </div>
+        <div class="config-actions">
+          <button class="btn-ghost config-cancel" (click)="cancelEdit()">CANCEL</button>
+          <button class="btn-ghost config-save" (click)="saveConfig()">&#x2713; SAVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ══ Main page ══ -->
+@if (!loading() && !error()) {
+  <div class="wheel-page">
+
+    <!-- Header -->
+    <div class="wheel-header">
+      <div>
+        <span class="pixel-label">ADMIN &middot; &#128274;</span>
+        <h1 class="wheel-title">WHEEL SPINNER</h1>
+      </div>
+      <button class="btn-ghost edit-sports-btn" (click)="openEdit()">&#9881; EDIT SPORTS</button>
+    </div>
+
+    <!-- Body: wheel + controls -->
+    <div class="wheel-body">
+
+      <!-- SVG Wheel -->
+      <div class="wheel-container arcade-card">
+        <svg viewBox="0 0 400 400" class="wheel-svg" preserveAspectRatio="xMidYMid meet">
+
+          <!-- Rotating disc -->
+          <g class="wheel-disc"
+             style="transform-origin: 200px 200px; transition: transform 4.5s cubic-bezier(0.15,0,0.1,1)"
+             [style.transform]="'rotate(' + wheelDeg() + 'deg)'">
+
+            @for (s of slices(); track s.slot.sport) {
+              <!-- Slice fill -->
+              <path [attr.d]="s.path" [attr.fill]="s.slot.color" opacity="0.85"/>
+              <!-- Slice border -->
+              <path [attr.d]="s.path" fill="none" stroke="rgba(6,4,15,0.6)" stroke-width="1.5"/>
+              <!-- Sport name -->
+              <text
+                [attr.x]="s.tx1" [attr.y]="s.ty1"
+                [attr.transform]="s.tf1"
+                text-anchor="middle"
+                dominant-baseline="middle"
+                class="slice-sport">{{ s.slot.sport }}</text>
+              <!-- Multiplier -->
+              <text
+                [attr.x]="s.tx2" [attr.y]="s.ty2"
+                [attr.transform]="s.tf2"
+                text-anchor="middle"
+                dominant-baseline="middle"
+                class="slice-multi">×{{ s.slot.multiplier.toFixed(1) }}</text>
+            }
+
+            <!-- Inner ring overlay -->
+            <circle cx="200" cy="200" r="38" fill="#06040F" stroke="rgba(42,24,80,0.8)" stroke-width="2"/>
+            <text x="200" y="200" text-anchor="middle" dominant-baseline="middle" class="hub-text">SPC26</text>
+          </g>
+
+          <!-- Fixed pointer (does NOT rotate with wheel) -->
+          <polygon points="188,4 212,4 200,34" fill="#FFD700" opacity="0.95"/>
+          <polygon points="190,4 210,4 200,30" fill="#06040F" opacity="0.4"/>
+
+          <!-- Outer ring -->
+          <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(42,24,80,0.9)" stroke-width="3"/>
+
+        </svg>
+      </div>
+
+      <!-- Controls column -->
+      <div class="wheel-controls">
+
+        <!-- Round selector -->
+        <div class="ctrl-block">
+          <label class="pixel-label ctrl-label">APPLY TO ROUND</label>
+          <select
+            class="round-select"
+            [ngModel]="targetRound()?.id"
+            (ngModelChange)="onRoundChange($event)">
+            @for (r of schedule(); track r.id) {
+              <option [value]="r.id">
+                R{{ r.round_number }}  {{ formatDate(r.round_date) }}{{ r.sport ? ' · ' + r.sport : '' }}
+              </option>
+            }
+          </select>
+          @if (roundAlreadySet() && !roundSaved()) {
+            <span class="already-set-warn">&#9888; Round already has a sport — spinning will overwrite</span>
+          }
+        </div>
+
+        <!-- Spin button -->
+        <button
+          class="spin-btn"
+          [class.spin-btn--spinning]="spinning()"
+          [disabled]="spinning()"
+          (click)="spin()">
+          @if (spinning()) { SPINNING... } @else { &#127921; SPIN }
+        </button>
+
+        <!-- Result card -->
+        @if (result(); as r) {
+          <div class="result-card" [style.border-color]="r.color + '55'" [style.box-shadow]="'0 0 24px ' + r.color + '33'">
+            <span class="pixel-label result-label">THE WHEEL HAS SPOKEN</span>
+            <div class="result-sport" [style.color]="r.color" [style.text-shadow]="'0 0 20px ' + r.color + '66'">
+              {{ r.sport }}
+            </div>
+            <div class="result-multi" [style.color]="r.color">
+              ×{{ r.multiplier.toFixed(1) }} MULTIPLIER
+            </div>
+
+            <!-- Actions -->
+            <div class="result-actions">
+              <button
+                class="btn-ghost result-btn result-btn--save"
+                [disabled]="savingRound()"
+                (click)="saveToRound()">
+                @if (savingRound()) { SAVING... }
+                @else if (roundSaved()) { &#x2713; SAVED TO R{{ targetRound()?.round_number }} }
+                @else { &#128190; SAVE TO ROUND }
+              </button>
+              <button class="btn-ghost result-btn result-btn--share" (click)="tryShare()">
+                &#128247; SHARE
+              </button>
+            </div>
+            @if (roundError()) {
+              <p class="result-error">{{ roundError() }}</p>
+            }
+          </div>
+        }
+
+        @if (!result() && !spinning()) {
+          <p class="spin-hint">Spin the wheel to pick this week's sport and multiplier</p>
+        }
+
+      </div>
+    </div>
+
+  </div>
+}

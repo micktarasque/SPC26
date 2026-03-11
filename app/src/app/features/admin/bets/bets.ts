@@ -36,6 +36,13 @@ export class Bets implements OnInit, OnDestroy {
   scoresError = signal<string | null>(null);
   rows = signal<ScoreRow[]>([]);
 
+  // Round detail editing
+  editSport      = signal('');
+  editMultiplier = signal(1.0);   // display value e.g. 2.0 → stored as bonus_pct 200
+  savingRound    = signal(false);
+  roundSaved     = signal(false);
+  roundEditError = signal<string | null>(null);
+
   private debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   constructor(private db: SupabaseService) {}
@@ -53,6 +60,10 @@ export class Bets implements OnInit, OnDestroy {
 
   async selectRound(round: Round) {
     this.selectedRound.set(round);
+    this.editSport.set(round.sport ?? '');
+    this.editMultiplier.set(round.bonus_pct / 100);
+    this.roundSaved.set(false);
+    this.roundEditError.set(null);
     this.loadingScores.set(true);
     this.scoresError.set(null);
     try {
@@ -91,6 +102,33 @@ export class Bets implements OnInit, OnDestroy {
     this.selectedRound.set(null);
     this.rows.set([]);
     this.scoresError.set(null);
+    this.roundEditError.set(null);
+  }
+
+  async saveRoundDetails() {
+    const round = this.selectedRound();
+    if (!round) return;
+    this.savingRound.set(true);
+    this.roundEditError.set(null);
+    this.roundSaved.set(false);
+    try {
+      const bonusPct = Math.round(this.editMultiplier() * 100);
+      await this.db.updateRound(round.id, {
+        sport:     this.editSport().trim() || null,
+        bonus_pct: bonusPct,
+      });
+      this.selectedRound.set({ ...round, sport: this.editSport().trim() || null, bonus_pct: bonusPct });
+      this.roundSaved.set(true);
+      setTimeout(() => this.roundSaved.set(false), 2500);
+    } catch (e: any) {
+      this.roundEditError.set(e?.message ?? 'Save failed');
+    } finally {
+      this.savingRound.set(false);
+    }
+  }
+
+  multiplierDisplay(): string {
+    return `×${this.editMultiplier().toFixed(1)}`;
   }
 
   ngOnDestroy() {

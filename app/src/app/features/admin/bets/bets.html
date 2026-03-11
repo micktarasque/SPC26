@@ -76,6 +76,49 @@
     </div>
   </div>
 
+  <!-- Round Details Edit Panel -->
+  <div class="round-edit-panel arcade-card">
+    <div class="arcade-card-inner round-edit-panel__inner">
+      <span class="pixel-label round-edit-panel__title">&#x270F; ROUND DETAILS</span>
+      <div class="round-edit-fields">
+        <div class="round-edit-field">
+          <label class="round-edit-label">SPORT</label>
+          <input
+            class="round-edit-input"
+            type="text"
+            placeholder="e.g. AFL"
+            [ngModel]="editSport()"
+            (ngModelChange)="editSport.set($event)"
+          />
+        </div>
+        <div class="round-edit-field">
+          <label class="round-edit-label">MULTIPLIER</label>
+          <input
+            class="round-edit-input round-edit-input--short"
+            type="number"
+            step="0.5"
+            min="1.0"
+            max="3.0"
+            [ngModel]="editMultiplier()"
+            (ngModelChange)="editMultiplier.set(+$event)"
+          />
+          <span class="round-edit-multi-badge">{{ multiplierDisplay() }}</span>
+        </div>
+        <button
+          class="btn-ghost action-btn round-edit-save"
+          [disabled]="savingRound()"
+          (click)="saveRoundDetails()">
+          @if (savingRound()) { SAVING... }
+          @else if (roundSaved()) { &#x2713; SAVED }
+          @else { SAVE }
+        </button>
+      </div>
+      @if (roundEditError()) {
+        <p class="round-edit-error">{{ roundEditError() }}</p>
+      }
+    </div>
+  </div>
+
   <!-- Score Entry Panel -->
   <div class="score-panel arcade-card glow-cyan">
     <div class="arcade-card-inner">

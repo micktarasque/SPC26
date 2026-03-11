@@ -176,6 +176,106 @@
   }
 }
 
+// ─── Round Edit Panel ──────────────────────────────────────────────────────────
+
+.round-edit-panel {
+  border-color: rgba(255, 215, 0, 0.25);
+
+  &__inner {
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__title {
+    color: rgba(255, 215, 0, 0.7);
+    font-size: 0.45rem;
+  }
+}
+
+.round-edit-fields {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.round-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.round-edit-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.38rem;
+  letter-spacing: 0.08em;
+  color: rgba(180, 150, 220, 0.55);
+}
+
+.round-edit-input {
+  background: var(--color-bg);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text);
+  outline: none;
+  min-width: 140px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus {
+    border-color: var(--color-gold);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+  }
+
+  &--short {
+    min-width: 72px;
+    max-width: 72px;
+    text-align: right;
+  }
+
+  appearance: textfield;
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+}
+
+.round-edit-multi-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  color: var(--color-gold);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  align-self: flex-end;
+  padding-bottom: 7px;
+}
+
+.round-edit-save {
+  align-self: flex-end;
+  color: var(--color-gold);
+  border-color: rgba(255, 215, 0, 0.4);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  padding: 9px 16px;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 215, 0, 0.08);
+    border-color: var(--color-gold);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+  }
+}
+
+.round-edit-error {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--color-loss);
+  margin: 0;
+}
+
 // ─── Step 2: Score Panel ───────────────────────────────────────────────────────
 
 .score-panel {

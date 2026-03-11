@@ -106,6 +106,14 @@ export class SupabaseService {
     if (error) throw error;
   }
 
+  async updateRound(id: string, updates: Partial<Pick<Round, 'sport' | 'special_event' | 'bonus_pct'>>): Promise<void> {
+    const { error } = await this.client
+      .from('weekly_schedule')
+      .update(updates)
+      .eq('id', id);
+    if (error) throw error;
+  }
+
   async deleteBetResult(userId: string, scheduleId: string): Promise<void> {
     const { error } = await this.client
       .from('bet_results')

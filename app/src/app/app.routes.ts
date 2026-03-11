@@ -41,6 +41,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'admin/wheel',
+    loadComponent: () => import('./features/admin/wheel/wheel').then(m => m.Wheel),
+    canActivate: [authGuard]
+  },
+  {
     path: 'admin',
     redirectTo: 'admin/bets'
   },

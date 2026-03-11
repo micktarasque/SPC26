@@ -1,0 +1,511 @@
+// ─── Typography ───────────────────────────────────────────────────────────────
+
+.pixel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  &.blink { animation: blink 1s step-end infinite; }
+  &.error { color: var(--color-loss); }
+}
+
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+}
+
+.state-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 40vh;
+}
+
+.state-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+// ─── Page Layout ──────────────────────────────────────────────────────────────
+
+.wheel-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  animation: float-up 0.4s ease both;
+}
+
+.wheel-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wheel-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  letter-spacing: 0.06em;
+  color: var(--color-text);
+  line-height: 1;
+  margin: 4px 0 0;
+}
+
+.edit-sports-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 0.06em;
+  padding: 10px 14px;
+  color: rgba(180, 150, 220, 0.7);
+  border-color: rgba(90, 62, 122, 0.5);
+
+  &:hover {
+    color: var(--color-text);
+    border-color: rgba(180, 150, 220, 0.6);
+  }
+}
+
+// ─── Body: two-column ────────────────────────────────────────────────────────
+
+.wheel-body {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  align-items: start;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ─── Wheel SVG Container ──────────────────────────────────────────────────────
+
+.wheel-container {
+  padding: 12px;
+  border-color: rgba(42, 24, 80, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wheel-svg {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  filter: drop-shadow(0 0 18px rgba(0, 0, 0, 0.6));
+
+  .slice-sport {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    fill: rgba(6, 4, 15, 0.9);
+    letter-spacing: 0px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .slice-multi {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    fill: rgba(6, 4, 15, 0.85);
+    letter-spacing: 1px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .hub-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    fill: rgba(180, 150, 220, 0.6);
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+// ─── Controls Column ─────────────────────────────────────────────────────────
+
+.wheel-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ctrl-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ctrl-label {
+  font-size: 0.45rem;
+}
+
+.round-select {
+  background: var(--color-bg);
+  border: 1px solid rgba(42, 24, 80, 0.8);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  width: 100%;
+
+  &:focus { border-color: var(--color-accent); }
+  option { background: var(--color-card); }
+}
+
+.already-set-warn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: rgba(255, 180, 0, 0.8);
+  letter-spacing: 0.02em;
+}
+
+// ─── Spin Button ─────────────────────────────────────────────────────────────
+
+.spin-btn {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+  background: rgba(255, 0, 168, 0.08);
+  border: 2px solid rgba(255, 0, 168, 0.45);
+  border-radius: 8px;
+  padding: 14px 0;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
+  text-shadow: 0 0 16px rgba(255, 0, 168, 0.5);
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 0, 168, 0.15);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 24px rgba(255, 0, 168, 0.3);
+  }
+
+  &--spinning {
+    animation: glow-pulse 0.8s ease-in-out infinite;
+    cursor: not-allowed;
+  }
+
+  &:disabled:not(.spin-btn--spinning) {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.spin-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: rgba(130, 100, 170, 0.5);
+  text-align: center;
+  line-height: 1.6;
+  margin: 0;
+}
+
+// ─── Result Card ─────────────────────────────────────────────────────────────
+
+.result-card {
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid;
+  background: var(--color-card);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+  animation: float-up 0.3s ease both;
+}
+
+.result-label {
+  font-size: 0.38rem;
+  color: rgba(180, 150, 220, 0.55);
+  letter-spacing: 0.12em;
+}
+
+.result-sport {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.result-multi {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.result-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.result-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.05em;
+  padding: 9px 14px;
+  white-space: nowrap;
+
+  &--save {
+    color: var(--color-win);
+    border-color: rgba(57, 255, 20, 0.4);
+    &:hover:not(:disabled) { background: rgba(57, 255, 20, 0.08); }
+  }
+
+  &--share {
+    color: var(--color-cyan);
+    border-color: rgba(0, 245, 255, 0.4);
+    &:hover { background: rgba(0, 245, 255, 0.08); }
+  }
+}
+
+.result-error {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--color-loss);
+  margin: 0;
+}
+
+// ─── Share Overlay ────────────────────────────────────────────────────────────
+
+.share-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 4, 15, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+
+.share-card {
+  background: var(--color-card);
+  border: 1px solid rgba(42, 24, 80, 0.8);
+  border-radius: 12px;
+  padding: 32px 28px;
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+
+  &__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+    text-shadow: 0 0 16px rgba(255, 0, 168, 0.5);
+    line-height: 1;
+  }
+
+  &__sub {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.38rem;
+    letter-spacing: 0.1em;
+    color: rgba(180, 150, 220, 0.5);
+  }
+
+  &__divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(42, 24, 80, 0.8);
+  }
+
+  &__label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.4rem;
+    letter-spacing: 0.1em;
+    color: rgba(180, 150, 220, 0.6);
+  }
+
+  &__sport {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  &__multi {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  &__round {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: rgba(180, 150, 220, 0.6);
+    letter-spacing: 0.08em;
+  }
+
+  &__hint {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.4rem;
+    letter-spacing: 0.08em;
+    color: rgba(180, 150, 220, 0.5);
+    line-height: 1.8;
+    margin: 0;
+  }
+}
+
+.share-close-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.05em;
+  padding: 9px 18px;
+  color: rgba(180, 150, 220, 0.5);
+  border-color: rgba(90, 62, 122, 0.4);
+  margin-top: 4px;
+}
+
+// ─── Config Overlay ───────────────────────────────────────────────────────────
+
+.config-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 4, 15, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.config-panel {
+  max-width: 480px;
+  width: 100%;
+  border-color: rgba(90, 62, 122, 0.6);
+
+  .arcade-card-inner {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.config-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.config-reset {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.38rem;
+  letter-spacing: 0.05em;
+  padding: 7px 12px;
+  color: rgba(180, 150, 220, 0.5);
+  border-color: rgba(90, 62, 122, 0.4);
+}
+
+.config-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.config-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.config-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.config-input {
+  background: var(--color-bg);
+  border: 1px solid rgba(42, 24, 80, 0.8);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus { border-color: var(--color-cyan); }
+
+  &--sport { flex: 1; min-width: 0; }
+
+  &--multi {
+    width: 68px;
+    text-align: right;
+    appearance: textfield;
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  }
+}
+
+.config-multi-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  color: var(--color-gold);
+  letter-spacing: 0.04em;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.config-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.config-cancel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.05em;
+  padding: 9px 14px;
+  color: rgba(180, 150, 220, 0.5);
+  border-color: rgba(90, 62, 122, 0.4);
+}
+
+.config-save {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.05em;
+  padding: 9px 14px;
+  color: var(--color-win);
+  border-color: rgba(57, 255, 20, 0.4);
+  &:hover { background: rgba(57, 255, 20, 0.08); }
+}
