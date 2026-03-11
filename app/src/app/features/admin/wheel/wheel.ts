@@ -96,7 +96,6 @@ export class Wheel implements OnInit {
   savingRound = signal(false);
   roundSaved  = signal(false);
   roundError  = signal<string | null>(null);
-  roundAlreadySet = signal(false);  // warn if round already has a sport
 
   constructor(private db: SupabaseService) {}
 
@@ -128,7 +127,6 @@ export class Wheel implements OnInit {
     this.targetRound.set(round);
     this.roundSaved.set(false);
     this.roundError.set(null);
-    this.roundAlreadySet.set(!!(round?.sport));
   }
 
   spin() {
@@ -173,7 +171,6 @@ export class Wheel implements OnInit {
         : r
       ));
       this.targetRound.set({ ...round, sport: result.sport, bonus_pct: Math.round(result.multiplier * 100) });
-      this.roundAlreadySet.set(true);
       this.roundSaved.set(true);
       setTimeout(() => this.roundSaved.set(false), 3000);
     } catch (e: any) {
