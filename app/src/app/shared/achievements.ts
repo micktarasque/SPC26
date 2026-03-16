@@ -69,8 +69,8 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'on_fire',       icon: '🔥', name: 'ON FIRE',         category: 'STREAK',     rarity: 'uncommon',  desc: 'Win 4 rounds in a row at any point in the season'        },
   { id: 'inferno',       icon: '💥', name: 'INFERNO',         category: 'STREAK',     rarity: 'legendary', desc: 'Win 6 rounds in a row — certified absolute unit'         },
   // ── STRATEGY ───────────────────────────────────────────────────────────────
-  { id: 'bonus_hunter',  icon: '⚡', name: 'BONUS HUNTER',   category: 'STRATEGY',   rarity: 'uncommon',  desc: 'Use the ×2 multiplier 3 or more times'                   },
-  { id: 'all_in',        icon: '🎰', name: 'ALL IN',          category: 'STRATEGY',   rarity: 'rare',      desc: 'Use the ×2 multiplier 5 or more times — no fear'        },
+  { id: 'bonus_hunter',  icon: '⚡', name: 'BONUS HUNTER',   category: 'STRATEGY',   rarity: 'uncommon',  desc: 'Activate the round multiplier 3 or more times'           },
+  { id: 'all_in',        icon: '🎰', name: 'ALL IN',          category: 'STRATEGY',   rarity: 'rare',      desc: 'Activate the round multiplier 5+ times — no fear'       },
   // ── COMMITMENT ─────────────────────────────────────────────────────────────
   { id: 'participation', icon: '🌈', name: 'SHOWING UP',      category: 'COMMITMENT', rarity: 'common',    desc: 'Play at least 1 round — you showed up, that counts'     },
   { id: 'committed',     icon: '💪', name: 'COMMITTED',       category: 'COMMITMENT', rarity: 'common',    desc: 'Play 20 or more rounds this season'                      },

@@ -1,0 +1,314 @@
+.state-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 40vh;
+}
+
+.pixel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  &.blink { animation: blink 1s step-end infinite; }
+  &.error { color: var(--color-loss); }
+}
+
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+  &.blink { animation: blink 1.2s step-end infinite; }
+}
+
+.state-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+// ─── Page Layout ───────────────────────────────────────────────────────────────
+
+.schedule-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  animation: float-up 0.4s ease both;
+}
+
+// ─── Header ────────────────────────────────────────────────────────────────────
+
+.sched-header {
+  border-color: rgba(0, 245, 255, 0.35);
+
+  &__inner {
+    padding: 16px 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+}
+
+.sched-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: 0.08em;
+  color: var(--color-cyan);
+  text-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
+  margin: 4px 0 0;
+  line-height: 1;
+}
+
+.sched-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  letter-spacing: 0.08em;
+  margin: 6px 0 0;
+}
+
+.sched-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: center;
+}
+
+.legend-item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.04em;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  &--next  { background: var(--color-accent); box-shadow: 0 0 6px rgba(255, 0, 168, 0.7); }
+  &--bonus { background: var(--color-gold);   box-shadow: 0 0 6px rgba(255, 215, 0, 0.7); }
+  &--tba   { background: var(--color-muted);  opacity: 0.5; }
+}
+
+// ─── Section ───────────────────────────────────────────────────────────────────
+
+.sched-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-label {
+  color: var(--color-cyan);
+  font-size: 0.5rem;
+}
+
+// ─── Upcoming Cards ────────────────────────────────────────────────────────────
+
+.round-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.round-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 14px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  position: relative;
+
+  &--next {
+    border-color: rgba(255, 0, 168, 0.5);
+    background: rgba(255, 0, 168, 0.04);
+    box-shadow: 0 0 16px rgba(255, 0, 168, 0.15);
+  }
+
+  &--bonus {
+    border-color: rgba(255, 215, 0, 0.4);
+    background: rgba(255, 215, 0, 0.03);
+  }
+
+  &--tba {
+    opacity: 0.65;
+  }
+
+  &:hover:not(&--tba) {
+    border-color: rgba(0, 245, 255, 0.3);
+    box-shadow: 0 0 12px rgba(0, 245, 255, 0.1);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  &__num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    color: var(--color-muted);
+    line-height: 1;
+  }
+
+  &__icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    margin: 2px 0;
+  }
+
+  &__sport {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.05rem;
+    letter-spacing: 0.06em;
+    color: var(--color-text);
+    line-height: 1.1;
+  }
+
+  &__pending {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.35rem;
+    color: var(--color-muted);
+    letter-spacing: 0.06em;
+    animation: blink 1.4s step-end infinite;
+  }
+
+  &__date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--color-muted);
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+
+  &__multi {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+}
+
+.next-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.32rem;
+  color: var(--color-accent);
+  letter-spacing: 0.06em;
+  padding: 3px 6px;
+  border: 1px solid rgba(255, 0, 168, 0.4);
+  border-radius: 3px;
+  background: rgba(255, 0, 168, 0.08);
+  animation: glow-pulse 1.5s ease-in-out infinite;
+  white-space: nowrap;
+}
+
+.bonus-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.32rem;
+  color: var(--color-gold);
+  letter-spacing: 0.05em;
+  padding: 3px 6px;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  border-radius: 3px;
+  background: rgba(255, 215, 0, 0.07);
+  white-space: nowrap;
+}
+
+// ─── Past Rounds List ──────────────────────────────────────────────────────────
+
+.past-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.past-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(42, 24, 80, 0.5);
+  background: var(--color-card);
+
+  &:last-child { border-bottom: none; }
+
+  &--bonus {
+    background: rgba(255, 215, 0, 0.02);
+  }
+
+  &__num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.95rem;
+    color: var(--color-muted);
+    letter-spacing: 0.05em;
+    width: 36px;
+    flex-shrink: 0;
+  }
+
+  &__icon {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  &__sport {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    letter-spacing: 0.05em;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__multi {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--color-muted);
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+
+    &--bonus {
+      color: var(--color-gold);
+      text-shadow: 0 0 6px rgba(255, 215, 0, 0.4);
+    }
+  }
+
+  &__date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: rgba(90, 62, 122, 0.8);
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+
+    @media (max-width: 480px) { display: none; }
+  }
+}

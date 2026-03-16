@@ -41,7 +41,7 @@
             NEXT: RD{{ nextRound()!.round_number < 10 ? '0' + nextRound()!.round_number : nextRound()!.round_number }}
             &nbsp;{{ formatDate(nextRound()!.round_date) }}&nbsp;
             {{ nextRound()!.special_event ?? nextRound()!.sport ?? 'TBA' }}
-            @if (nextRound()!.bonus_pct > 100) { &nbsp;⚡ BONUS ×2 }
+            @if (nextRound()!.bonus_pct > 100) { &nbsp;⚡ BONUS ×{{ (nextRound()!.bonus_pct / 100).toFixed(1) }} }
           }
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </span>
@@ -116,7 +116,7 @@
         <div class="ck-next-round__header">
           <span class="pixel-label">INCOMING</span>
           @if (nextRound() && nextRound()!.bonus_pct > 100) {
-            <span class="ck-bonus-badge">⚡ BONUS ×2</span>
+            <span class="ck-bonus-badge">⚡ BONUS ×{{ (nextRound()!.bonus_pct / 100).toFixed(1) }}</span>
           }
         </div>
 

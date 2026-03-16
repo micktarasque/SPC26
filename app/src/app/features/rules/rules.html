@@ -1,0 +1,48 @@
+<div class="rules-page">
+
+  <!-- Header -->
+  <div class="rules-header arcade-card glow-pink">
+    <div class="arcade-card-inner rules-header__inner">
+      <div>
+        <span class="pixel-label">SPC26 · 2026</span>
+        <h1 class="rules-title">RULES &amp; REGS</h1>
+        <p class="rules-sub">READ BEFORE PLAYING · SEASON 2026</p>
+      </div>
+      <div class="rules-header__badge">
+        <span class="insert-coin">★ INSERT COIN ★</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rule Sections -->
+  @for (section of sections; track section.title) {
+    <div class="rule-card arcade-card">
+      <div class="arcade-card-inner">
+        <div class="rule-card__header">
+          <span class="rule-card__icon">{{ section.icon }}</span>
+          <span class="rule-card__title pixel-label">{{ section.title }}</span>
+        </div>
+        <ul class="rule-list">
+          @for (rule of section.rules; track $index) {
+            <li class="rule-item">
+              <span class="rule-bullet">&#x25B6;</span>
+              <span class="rule-text">{{ rule }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+
+  <!-- Footer note -->
+  <div class="rules-footer arcade-card">
+    <div class="arcade-card-inner rules-footer__inner">
+      <span class="pixel-label rules-footer__label">&#x26A0; FINE PRINT</span>
+      <p class="rules-footer__text">
+        Rules are subject to change by admin at any time. Any disputes are settled by the admin.
+        This is a friendly competition — good vibes only. Banter strongly encouraged.
+      </p>
+    </div>
+  </div>
+
+</div>

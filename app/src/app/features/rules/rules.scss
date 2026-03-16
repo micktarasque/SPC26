@@ -1,0 +1,152 @@
+.pixel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--color-muted);
+}
+
+// ─── Layout ────────────────────────────────────────────────────────────────────
+
+.rules-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  animation: float-up 0.4s ease both;
+}
+
+// ─── Header ────────────────────────────────────────────────────────────────────
+
+.rules-header {
+  border-color: rgba(255, 0, 168, 0.4);
+
+  &__inner {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__badge {
+    align-self: center;
+  }
+}
+
+.rules-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  text-shadow: 0 0 20px rgba(255, 0, 168, 0.5);
+  margin: 4px 0 0;
+  line-height: 1;
+}
+
+.rules-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  letter-spacing: 0.08em;
+  margin: 6px 0 0;
+}
+
+.insert-coin {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  color: var(--color-gold);
+  letter-spacing: 0.12em;
+  animation: blink 1.2s step-end infinite;
+}
+
+// ─── Rule Cards ────────────────────────────────────────────────────────────────
+
+.rule-card {
+  border-color: rgba(42, 24, 80, 0.8);
+
+  .arcade-card-inner {
+    padding: 16px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    color: var(--color-cyan);
+    text-shadow: 0 0 8px rgba(0, 245, 255, 0.3);
+    font-size: 0.5rem;
+  }
+}
+
+// ─── Rule List ─────────────────────────────────────────────────────────────────
+
+.rule-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rule-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.rule-bullet {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 3px;
+  opacity: 0.7;
+}
+
+.rule-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: rgba(220, 200, 255, 0.85);
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+// ─── Footer ────────────────────────────────────────────────────────────────────
+
+.rules-footer {
+  border-color: rgba(255, 215, 0, 0.2);
+
+  &__inner {
+    padding: 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__label {
+    color: rgba(255, 215, 0, 0.6);
+    font-size: 0.42rem;
+  }
+
+  &__text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--color-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+}

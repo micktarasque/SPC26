@@ -1,0 +1,86 @@
+@if (loading()) {
+  <div class="state-screen">
+    <span class="pixel-title blink">LOADING...</span>
+  </div>
+}
+
+@if (error()) {
+  <div class="state-screen">
+    <span class="pixel-title error">&#x26A0; ERROR</span>
+    <p class="state-msg">{{ error() }}</p>
+  </div>
+}
+
+@if (!loading() && !error()) {
+<div class="schedule-page">
+
+  <!-- Page Header -->
+  <div class="sched-header arcade-card glow-cyan">
+    <div class="arcade-card-inner sched-header__inner">
+      <div>
+        <span class="pixel-label">SEASON 2026</span>
+        <h1 class="sched-title">BET SCHEDULE</h1>
+        <p class="sched-sub">28 ROUNDS · 28 MAR – 3 OCT 2026</p>
+      </div>
+      <div class="sched-legend">
+        <span class="legend-item"><span class="legend-dot legend-dot--next"></span>NEXT UP</span>
+        <span class="legend-item"><span class="legend-dot legend-dot--bonus"></span>BONUS ROUND</span>
+        <span class="legend-item"><span class="legend-dot legend-dot--tba"></span>SPORT TBA</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming rounds -->
+  @if (upcoming().length > 0) {
+    <div class="sched-section">
+      <span class="section-label pixel-label">&#x25B6; UPCOMING</span>
+      <div class="round-cards">
+        @for (r of upcoming(); track r.id) {
+          <div class="round-card"
+            [class.round-card--next]="isNext(r)"
+            [class.round-card--bonus]="isBonus(r)"
+            [class.round-card--tba]="!r.sport">
+            <div class="round-card__header">
+              <span class="round-card__num">R{{ roundLabel(r.round_number) }}</span>
+              @if (isNext(r)) {
+                <span class="next-badge">NEXT</span>
+              }
+              @if (isBonus(r)) {
+                <span class="bonus-badge">&#x26A1; {{ multiplierLabel(r) }}</span>
+              }
+            </div>
+            <div class="round-card__icon">{{ sportIcon(r.sport) }}</div>
+            <div class="round-card__sport">{{ r.special_event ?? r.sport ?? 'TBA' }}</div>
+            @if (!r.sport) {
+              <div class="round-card__pending">SPIN PENDING</div>
+            }
+            <div class="round-card__date">{{ formatDate(r.round_date) }}</div>
+            @if (!isBonus(r) && r.sport) {
+              <div class="round-card__multi">{{ multiplierLabel(r) }}</div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Past rounds -->
+  @if (past().length > 0) {
+    <div class="sched-section">
+      <span class="section-label pixel-label">&#x25A0; COMPLETED</span>
+      <div class="past-list">
+        @for (r of past(); track r.id; let last = $last) {
+          <div class="past-row" [class.past-row--bonus]="isBonus(r)">
+            <span class="past-row__num">R{{ roundLabel(r.round_number) }}</span>
+            <span class="past-row__icon">{{ sportIcon(r.sport) }}</span>
+            <span class="past-row__sport">{{ r.special_event ?? r.sport ?? 'TBA' }}</span>
+            <span class="past-row__multi" [class.past-row__multi--bonus]="isBonus(r)">{{ multiplierLabel(r) }}</span>
+            <span class="past-row__date">{{ formatDate(r.round_date) }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+</div>
+}

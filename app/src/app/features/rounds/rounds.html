@@ -54,7 +54,7 @@
                     <th class="col-round" [class.col-bonus]="col.isBonus">
                       <div class="round-header">
                         @if (col.isBonus) {
-                          <span class="bonus-icon">&#9889;</span>
+                          <span class="bonus-icon">&#9889;&times;{{ col.multiplier.toFixed(1) }}</span>
                         }
                         <span class="round-num">R{{ roundLabel(col.round_number) }}</span>
                         <span class="round-date">{{ formatDate(col.round_date) }}</span>
@@ -89,7 +89,7 @@
                             [class.score-null]="cell.gross === null"
                           >{{ formatGross(cell.gross) }}</span>
                           @if (cell.apply_multiplier) {
-                            <span class="mult-badge">&#9889;&times;2</span>
+                            <span class="mult-badge">&#9889;&times;{{ col.multiplier.toFixed(1) }}</span>
                           }
                         </div>
                       </td>

@@ -27,6 +27,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/achievements/achievements').then(m => m.Achievements)
   },
   {
+    path: 'schedule',
+    loadComponent: () => import('./features/schedule/schedule').then(m => m.Schedule)
+  },
+  {
+    path: 'rules',
+    loadComponent: () => import('./features/rules/rules').then(m => m.Rules)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/login/login').then(m => m.Login)
   },

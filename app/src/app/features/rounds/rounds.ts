@@ -8,6 +8,7 @@ interface RoundCol {
   sport: string | null;
   special_event: string | null;
   bonus_pct: number;
+  multiplier: number;
   isBonus: boolean;
   avgGross: number | null;
   winner: string | null;
@@ -93,7 +94,8 @@ export class Rounds implements OnInit {
           sport: s.sport,
           special_event: s.special_event,
           bonus_pct: s.bonus_pct,
-          isBonus: s.bonus_pct === 200,
+          multiplier: s.bonus_pct / 100,
+          isBonus: s.bonus_pct > 100,
           avgGross,
           winner,
           highestGross,
