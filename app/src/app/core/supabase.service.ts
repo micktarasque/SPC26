@@ -107,11 +107,15 @@ export class SupabaseService {
   }
 
   async updateRound(id: string, updates: Partial<Pick<Round, 'sport' | 'special_event' | 'bonus_pct'>>): Promise<void> {
-    const { error } = await this.client
+    const { data, error } = await this.client
       .from('weekly_schedule')
       .update(updates)
-      .eq('id', id);
+      .eq('id', id)
+      .select('id');
     if (error) throw error;
+    if (!data || data.length === 0) {
+      throw new Error('Round update was blocked — add an RLS UPDATE policy on weekly_schedule for authenticated users');
+    }
   }
 
   async deleteBetResult(userId: string, scheduleId: string): Promise<void> {

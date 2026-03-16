@@ -93,16 +93,18 @@
         </div>
         <div class="round-edit-field">
           <label class="round-edit-label">MULTIPLIER</label>
-          <input
-            class="round-edit-input round-edit-input--short"
-            type="number"
-            step="0.5"
-            min="1.0"
-            max="3.0"
-            [ngModel]="editMultiplier()"
-            (ngModelChange)="editMultiplier.set(+$event)"
-          />
-          <span class="round-edit-multi-badge">{{ multiplierDisplay() }}</span>
+          <div class="round-edit-multi-row">
+            <input
+              class="round-edit-input round-edit-input--short"
+              type="number"
+              step="0.5"
+              min="1.0"
+              max="3.0"
+              [ngModel]="editMultiplier()"
+              (ngModelChange)="editMultiplier.set(+$event)"
+            />
+            <span class="round-edit-multi-badge">{{ multiplierDisplay() }}</span>
+          </div>
         </div>
         <button
           class="btn-ghost action-btn round-edit-save"
