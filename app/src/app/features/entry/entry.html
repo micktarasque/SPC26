@@ -13,70 +13,54 @@
   </div>
 }
 
-<!-- ═══ STEP 1: ROUND PICKER ═══ -->
-@if (!loading() && !error() && !selectedRound()) {
+@if (!loading() && !error()) {
 <div class="bets-page">
 
-  <div class="page-header arcade-card glow-pink">
-    <div class="arcade-card-inner page-header__inner">
-      <div>
-        <span class="pixel-label">ADMIN</span>
-        <h1 class="page-title">SCORE ENTRY</h1>
-      </div>
-      <span class="pixel-label">SELECT A ROUND</span>
-    </div>
-  </div>
-
-  <div class="round-picker arcade-card glow-cyan">
-    <div class="arcade-card-inner">
-      <span class="pixel-title round-picker__title">SEASON 2026</span>
-
-      @if (schedule().length === 0) {
-        <div class="empty-state">
-          <span class="pixel-label blink">&#x25B6; NO ROUNDS FOUND</span>
-        </div>
-      } @else {
-        <div class="round-grid">
-          @for (round of schedule(); track round.id) {
-            <button class="round-card" (click)="selectRound(round)">
-              <span class="round-card__num">{{ round.round_number < 10 ? '0' + round.round_number : round.round_number }}</span>
-              <span class="round-card__date">{{ formatDate(round.round_date) }}</span>
-              <span class="round-card__sport">{{ round.special_event ?? round.sport ?? 'TBA' }}</span>
-              @if (isBonus(round)) {
-                <span class="round-card__bonus">&#x26A1;&#xD7;2</span>
-              }
-            </button>
-          }
-        </div>
-      }
-    </div>
-  </div>
-
-</div>
-}
-
-<!-- ═══ STEP 2: SCORE ENTRY ═══ -->
-@if (!loading() && !error() && selectedRound()) {
-<div class="bets-page">
-
-  <!-- Header -->
+  <!-- Header: title + round selector -->
   <div class="page-header arcade-card glow-pink">
     <div class="arcade-card-inner page-header__inner">
       <div class="page-header__left">
-        <button class="btn-ghost back-btn" (click)="backToRounds()">&#x2190; ROUNDS</button>
         <div>
-          <span class="pixel-label">ROUND {{ selectedRound()!.round_number }}</span>
-          <h1 class="page-title">{{ selectedRound()!.special_event ?? selectedRound()!.sport ?? 'TBA' }}</h1>
-          <span class="round-date">{{ formatDate(selectedRound()!.round_date) }}</span>
+          <span class="pixel-label">WEEKLY RESULTS</span>
+          <h1 class="page-title">SCORE ENTRY</h1>
         </div>
       </div>
-      @if (isBonus(selectedRound()!)) {
-        <span class="bonus-badge">&#x26A1; BONUS &#xD7;2</span>
-      }
+
+      <div class="header-controls">
+        @if (selectedRound(); as r) {
+          @if (isBonus(r)) {
+            <span class="bonus-badge">&#x26A1; BONUS {{ multiplierDisplay() }}</span>
+          }
+        }
+        <label class="round-select-wrap">
+          <span class="pixel-label">ROUND</span>
+          <select
+            class="round-select"
+            [ngModel]="selectedRound()?.id"
+            (ngModelChange)="onRoundChange($event)">
+            @for (r of schedule(); track r.id) {
+              <option [value]="r.id">
+                R{{ r.round_number < 10 ? '0' + r.round_number : r.round_number }} ·
+                {{ formatDate(r.round_date) }}{{ (r.special_event ?? r.sport) ? ' · ' + (r.special_event ?? r.sport) : '' }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
     </div>
   </div>
 
-  <!-- Round Details Edit Panel -->
+  <!-- Unlock banner -->
+  @if (!lock.unlocked()) {
+    <div class="lock-banner arcade-card">
+      <div class="arcade-card-inner lock-banner__inner">
+        <span class="lock-banner__text">&#128274; Editing is locked. Unlock to change scores or round details.</span>
+        <button class="btn-ghost lock-banner__btn" (click)="unlock()">UNLOCK</button>
+      </div>
+    </div>
+  }
+
+  <!-- Round details (sport + multiplier) -->
   <div class="round-edit-panel arcade-card">
     <div class="arcade-card-inner round-edit-panel__inner">
       <span class="pixel-label round-edit-panel__title">&#x270F; ROUND DETAILS</span>
@@ -87,6 +71,7 @@
             class="round-edit-input"
             type="text"
             placeholder="e.g. AFL"
+            [disabled]="!lock.unlocked()"
             [ngModel]="editSport()"
             (ngModelChange)="editSport.set($event)"
           />
@@ -100,6 +85,7 @@
               step="0.5"
               min="1.0"
               max="3.0"
+              [disabled]="!lock.unlocked()"
               [ngModel]="editMultiplier()"
               (ngModelChange)="editMultiplier.set(+$event)"
             />
@@ -108,7 +94,7 @@
         </div>
         <button
           class="btn-ghost action-btn round-edit-save"
-          [disabled]="savingRound()"
+          [disabled]="savingRound() || !lock.unlocked()"
           (click)="saveRoundDetails()">
           @if (savingRound()) { SAVING... }
           @else if (roundSaved()) { &#x2713; SAVED }
@@ -121,7 +107,7 @@
     </div>
   </div>
 
-  <!-- Score Entry Panel -->
+  <!-- Score Entry -->
   <div class="score-panel arcade-card glow-cyan">
     <div class="arcade-card-inner">
 
@@ -166,7 +152,7 @@
                 [ngModel]="row.gross"
                 (ngModelChange)="onGrossChange(row, $event)"
                 (blur)="onBlur(row)"
-                [disabled]="row.saving"
+                [disabled]="row.saving || !lock.unlocked()"
               />
             </div>
 
@@ -176,7 +162,7 @@
                   type="checkbox"
                   [ngModel]="row.applyMultiplier"
                   (ngModelChange)="row.applyMultiplier = $event; onMultiplierChange(row)"
-                  [disabled]="row.saving"
+                  [disabled]="row.saving || !lock.unlocked()"
                 />
                 <span class="multi-toggle__label">{{ row.applyMultiplier ? 'ON' : 'OFF' }}</span>
               </label>
@@ -191,7 +177,7 @@
                 <span class="pixel-label pending-label blink">&#x2026;</span>
               } @else if (row.saveError) {
                 <span class="row-error">{{ row.saveError }}</span>
-              } @else if (hasGross(row)) {
+              } @else if (hasGross(row) && lock.unlocked()) {
                 <button
                   class="btn-ghost action-btn action-btn--del"
                   (click)="deleteRow(row)"

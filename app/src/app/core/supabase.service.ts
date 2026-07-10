@@ -69,21 +69,6 @@ export class SupabaseService {
     return data ?? [];
   }
 
-  async addUser(name: string): Promise<void> {
-    const { error } = await this.client
-      .from('users')
-      .insert({ name });
-    if (error) throw error;
-  }
-
-  async setUserActive(id: string, active: boolean): Promise<void> {
-    const { error } = await this.client
-      .from('users')
-      .update({ active })
-      .eq('id', id);
-    if (error) throw error;
-  }
-
   // ─── Bet Results ──────────────────────────────────────────────────────────
 
   async getBetResults(scheduleId?: string): Promise<BetResult[]> {

@@ -1,59 +1,44 @@
-# App
+# TIPBOARD — SPC26 2026
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.10.
+A retro-arcade tipping leaderboard for the SPC26 2026 season. Angular 20 standalone
+app, Supabase backend, deployed to GitHub Pages from `docs/`.
 
-## Development server
+## Pages
 
-To start a local development server, run:
+| Path        | Page              | Purpose                                              |
+|-------------|-------------------|------------------------------------------------------|
+| `/`         | Dashboard         | Leaderboard, streaks, season stats, heat map         |
+| `/entry`    | Result Entry      | Enter weekly scores + set the round's sport/multiplier |
+| `/schedule` | Schedule          | Upcoming and past rounds                             |
+| `/wheel`    | Wheel Spinner     | Spin to pick a round's sport + multiplier            |
+
+There is no login. Editing (Result Entry + Wheel "save to round") is gated by a
+shared **PIN** held in `environment.editPin`. This is a convenience speed-bump,
+**not** real security — anyone can read the PIN from the bundle. Actual write
+protection is enforced by Supabase Row Level Security (see below).
+
+## Setup
 
 ```bash
+cd app
+npm install
+cp src/environments/environment.example.ts src/environments/environment.ts
+# edit environment.ts: supabaseUrl, supabaseAnonKey, editPin
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Supabase / RLS
 
-## Code scaffolding
+Because the app no longer uses Supabase Auth, the anon key must be allowed to
+write `bet_results` and update `weekly_schedule`. Run
+[`supabase/rls-anon-write.sql`](../supabase/rls-anon-write.sql) once in the
+Supabase SQL editor. Players (`users`) are managed directly in the Supabase
+table editor — the app does not write them.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Build / Deploy
 
 ```bash
-ng generate --help
+ng build          # outputs to ../docs with baseHref /SPC26/ for GitHub Pages
 ```
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Commit the `docs/` folder; GitHub Pages serves from it.

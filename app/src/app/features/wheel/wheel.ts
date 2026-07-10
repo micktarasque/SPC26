@@ -1,7 +1,8 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService } from '../../../core/supabase.service';
-import { Round } from '../../../shared/models/round.model';
+import { SupabaseService } from '../../core/supabase.service';
+import { EditLockService } from '../../core/edit-lock.service';
+import { Round } from '../../shared/models/round.model';
 
 const SLICE_COUNT = 10;
 const SLICE_DEG   = 360 / SLICE_COUNT;  // 36°
@@ -97,7 +98,7 @@ export class Wheel implements OnInit {
   roundSaved  = signal(false);
   roundError  = signal<string | null>(null);
 
-  constructor(private db: SupabaseService) {}
+  constructor(private db: SupabaseService, public lock: EditLockService) {}
 
   async ngOnInit() {
     try {
@@ -157,6 +158,7 @@ export class Wheel implements OnInit {
     const round  = this.targetRound();
     const result = this.result();
     if (!round || !result) return;
+    if (!this.lock.requireUnlock()) return;
 
     this.savingRound.set(true);
     this.roundError.set(null);
@@ -196,6 +198,7 @@ export class Wheel implements OnInit {
 
   // Config editor
   openEdit() {
+    if (!this.lock.requireUnlock()) return;
     this.editSlotsArr = this.slots().map(s => ({ ...s }));
     this.editMode.set(true);
   }

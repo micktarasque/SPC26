@@ -1,0 +1,17 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "",
+
+    "// SQL_CONNECTION_STRING": "ADO.NET connection string from Azure Portal → SQL DB → Connection strings. Keep Encrypt=True.",
+    "SQL_CONNECTION_STRING": "Server=tcp:YOUR_SERVER.database.windows.net,1433;Initial Catalog=spc26;User ID=sqladmin;Password=YOUR_PASSWORD;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+
+    "// EDIT_PIN": "Shared PIN required on all write endpoints. MUST match the Angular app's environment.editPin.",
+    "EDIT_PIN": "2026"
+  },
+  "Host": {
+    "CORS": "*",
+    "CORSCredentials": false
+  }
+}

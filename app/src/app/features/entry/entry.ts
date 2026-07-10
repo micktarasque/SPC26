@@ -1,13 +1,10 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService } from '../../../core/supabase.service';
-import { Round } from '../../../shared/models/round.model';
-import { User } from '../../../shared/models/user.model';
-import { BetResult } from '../../../shared/models/bet-result.model';
-
-// TODO(review): On mobile (< 600px) the multiplier toggle and action buttons are hidden
-// (bets.scss). Auto-save on blur still works for gross entry, but the ⚡×2 multiplier
-// cannot be set on mobile. Consider a mobile-friendly inline toggle or swipe action.
+import { SupabaseService } from '../../core/supabase.service';
+import { EditLockService } from '../../core/edit-lock.service';
+import { Round } from '../../shared/models/round.model';
+import { User } from '../../shared/models/user.model';
+import { BetResult } from '../../shared/models/bet-result.model';
 
 interface ScoreRow {
   user: User;
@@ -20,12 +17,12 @@ interface ScoreRow {
 }
 
 @Component({
-  selector: 'app-bets',
+  selector: 'app-entry',
   imports: [FormsModule],
-  templateUrl: './bets.html',
-  styleUrl: './bets.scss',
+  templateUrl: './entry.html',
+  styleUrl: './entry.scss',
 })
-export class Bets implements OnInit, OnDestroy {
+export class Entry implements OnInit, OnDestroy {
   loading = signal(true);
   error = signal<string | null>(null);
 
@@ -36,7 +33,7 @@ export class Bets implements OnInit, OnDestroy {
   scoresError = signal<string | null>(null);
   rows = signal<ScoreRow[]>([]);
 
-  // Round detail editing
+  // Round detail editing (sport + multiplier)
   editSport      = signal('');
   editMultiplier = signal(1.0);   // display value e.g. 2.0 → stored as bonus_pct 200
   savingRound    = signal(false);
@@ -45,17 +42,26 @@ export class Bets implements OnInit, OnDestroy {
 
   private debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
-  constructor(private db: SupabaseService) {}
+  constructor(private db: SupabaseService, public lock: EditLockService) {}
 
   async ngOnInit() {
     try {
       const schedule = await this.db.getSchedule();
       this.schedule.set(schedule);
+      // Default to the current/next round so entry starts on the relevant week.
+      const today = new Date().toISOString().split('T')[0];
+      const next = schedule.find(r => r.round_date >= today) ?? schedule[schedule.length - 1];
+      if (next) await this.selectRound(next);
     } catch (e: any) {
       this.error.set(e?.message ?? 'Failed to load schedule');
     } finally {
       this.loading.set(false);
     }
+  }
+
+  onRoundChange(roundId: string) {
+    const round = this.schedule().find(r => r.id === roundId);
+    if (round) this.selectRound(round);
   }
 
   async selectRound(round: Round) {
@@ -98,16 +104,14 @@ export class Bets implements OnInit, OnDestroy {
     }
   }
 
-  backToRounds() {
-    this.selectedRound.set(null);
-    this.rows.set([]);
-    this.scoresError.set(null);
-    this.roundEditError.set(null);
+  unlock() {
+    this.lock.requireUnlock();
   }
 
   async saveRoundDetails() {
     const round = this.selectedRound();
     if (!round) return;
+    if (!this.lock.requireUnlock()) return;
     this.savingRound.set(true);
     this.roundEditError.set(null);
     this.roundSaved.set(false);
@@ -117,7 +121,9 @@ export class Bets implements OnInit, OnDestroy {
         sport:     this.editSport().trim() || null,
         bonus_pct: bonusPct,
       });
-      this.selectedRound.set({ ...round, sport: this.editSport().trim() || null, bonus_pct: bonusPct });
+      const updated = { ...round, sport: this.editSport().trim() || null, bonus_pct: bonusPct };
+      this.selectedRound.set(updated);
+      this.schedule.update(s => s.map(r => r.id === round.id ? updated : r));
       this.roundSaved.set(true);
       setTimeout(() => this.roundSaved.set(false), 2500);
     } catch (e: any) {
@@ -174,6 +180,7 @@ export class Bets implements OnInit, OnDestroy {
   async deleteRow(row: ScoreRow) {
     const round = this.selectedRound();
     if (!round) return;
+    if (!this.lock.requireUnlock()) return;
 
     row.saving = true;
     row.saveError = null;
@@ -215,6 +222,7 @@ export class Bets implements OnInit, OnDestroy {
   }
 
   private scheduleAutoSave(row: ScoreRow) {
+    if (!this.lock.unlocked()) return;
     const key = row.user.id;
     clearTimeout(this.debounceTimers.get(key));
     row.pending = true;

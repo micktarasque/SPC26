@@ -13,67 +13,134 @@
   </div>
 }
 
-<!-- ═══════════════════════════════════════════════════════════ COCKPIT DASHBOARD -->
 @if (!loading() && !error()) {
 <div class="dashboard">
 
-  <!-- ── ROW 0: TELEMETRY TICKER ─────────────────────────────────────────────── -->
-  <div class="ck-ticker arcade-card">
-    <div class="arcade-card-inner ck-ticker__inner">
-      <span class="ck-ticker__live pixel-label">● LIVE</span>
-      <div class="ck-ticker__track">
-        <span class="ck-ticker__text">
-          ⚡ SPC26 · SEASON 2026
-          &nbsp;&nbsp;·&nbsp;&nbsp;
-          LEADER: {{ players()[0]?.name ?? '—' }}
-          &nbsp;&nbsp;·&nbsp;&nbsp;
-          NET: {{ formatNet(players()[0]?.total_net ?? null) }}
-          &nbsp;&nbsp;·&nbsp;&nbsp;
-          ROUNDS PLAYED: {{ completedRoundCount() }} / {{ totalRounds }}
-          &nbsp;&nbsp;·&nbsp;&nbsp;
-          GROUP WIN RATE: {{ groupWinRate() !== null ? groupWinRate() + '%' : '—' }}
-          &nbsp;&nbsp;·&nbsp;&nbsp;
-          P1 → P2 GAP: {{ p2Gap() !== null ? p2Gap() + ' PTS' : '—' }}
-          &nbsp;&nbsp;·&nbsp;&nbsp;
-          SEASON COMPLETE: {{ seasonPct() }}%
-          @if (nextRound()) {
-            &nbsp;&nbsp;·&nbsp;&nbsp;
-            NEXT: RD{{ nextRound()!.round_number < 10 ? '0' + nextRound()!.round_number : nextRound()!.round_number }}
-            &nbsp;{{ formatDate(nextRound()!.round_date) }}&nbsp;
-            {{ nextRound()!.special_event ?? nextRound()!.sport ?? 'TBA' }}
-            @if (nextRound()!.bonus_pct > 100) { &nbsp;⚡ BONUS ×{{ (nextRound()!.bonus_pct / 100).toFixed(1) }} }
-          }
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        </span>
+  <!-- ── HEADER: title + view selector ──────────────────────────────────────── -->
+  <div class="dash-head arcade-card glow-pink">
+    <div class="arcade-card-inner dash-head__inner">
+      <div class="dash-head__title">
+        <span class="pixel-label">SPC26 · SEASON 2026</span>
+        <h1 class="dash-head__h1">DASHBOARD</h1>
       </div>
+      <label class="view-select-wrap">
+        <span class="pixel-label">VIEW</span>
+        <select class="view-select" [ngModel]="view()" (ngModelChange)="setView($event)">
+          @for (v of views; track v.id) {
+            <option [value]="v.id">{{ v.label }}</option>
+          }
+        </select>
+      </label>
     </div>
   </div>
 
-  <!-- ── MAIN COCKPIT GRID ───────────────────────────────────────────────────── -->
-  <div class="ck-grid">
+  <!-- ════════════════════════════════════════════════ OVERVIEW (default) ═══ -->
+  @if (view() === 'overview') {
 
-    <!-- ╔══════════════════════════╗ -->
-    <!-- ║   PANEL A: STANDINGS    ║ -->
-    <!-- ╚══════════════════════════╝ -->
-    <div class="ck-panel ck-standings arcade-card glow-cyan">
+    <!-- KPI figure grid -->
+    <div class="kpi-grid">
+      @for (k of kpis(); track k.label) {
+        <div class="kpi-tile arcade-card">
+          <span class="kpi-tile__label">{{ k.label }}</span>
+          <span class="kpi-tile__val kpi-tile__val--{{ k.tone }}">{{ k.value }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="ov-grid">
+
+      <!-- Top 3 podium -->
+      <div class="podium arcade-card glow-cyan">
+        <div class="arcade-card-inner">
+          <div class="section-head">
+            <span class="pixel-title">TOP 3</span>
+            <span class="ck-season-tag">{{ completedRoundCount() }} RDS PLAYED</span>
+          </div>
+          @if (top3().length === 0) {
+            <div class="ck-empty"><span class="pixel-label blink">▶ NO PLAYERS YET</span></div>
+          } @else {
+            <div class="podium__cards">
+              @for (p of top3(); track p.user_id) {
+                <div class="pod-card" [attr.data-color]="rankColor(p.rank)">
+                  <span class="pod-card__rank">{{ rankLabel(p.rank) }}</span>
+                  <span class="pod-card__name">{{ p.name }}</span>
+                  <span class="pod-card__net"
+                        [class.score-net--pos]="(p.total_net ?? 0) > 0"
+                        [class.score-net--neg]="(p.total_net ?? 0) < 0"
+                        [class.score-net--null]="p.total_net === null">
+                    {{ formatNet(p.total_net) }}
+                  </span>
+                  <span class="pod-card__sub">
+                    {{ playerWinRate(p.user_id) !== null ? playerWinRate(p.user_id) + '% WIN' : '—' }}
+                    @if (p.streak > 0 && p.streakType === 'win') { · {{ p.streak }}🔥 }
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Next round -->
+      <div class="ck-next-round arcade-card glow-pink">
+        <div class="arcade-card-inner">
+          <div class="ck-next-round__header">
+            <span class="pixel-label">NEXT ROUND</span>
+            @if (nextRound() && nextRound()!.bonus_pct > 100) {
+              <span class="ck-bonus-badge">⚡ BONUS ×{{ (nextRound()!.bonus_pct / 100).toFixed(1) }}</span>
+            }
+          </div>
+
+          @if (nextRound()) {
+            <div class="ck-next-round__num">
+              ROUND {{ nextRound()!.round_number < 10 ? '0' + nextRound()!.round_number : nextRound()!.round_number }}
+            </div>
+            <div class="ck-next-round__date">{{ formatDate(nextRound()!.round_date) }}</div>
+            <div class="ck-next-round__sport-icon">
+              @if (nextRound()!.sport === 'Races') { 🏇 }
+              @else if (nextRound()!.sport === 'Golf') { ⛳ }
+              @else if (nextRound()!.sport === 'NRL') { 🏉 }
+              @else if (nextRound()!.sport === 'Soccer') { ⚽ }
+              @else if (nextRound()!.sport === 'Cycling') { 🚴 }
+              @else if (nextRound()!.sport === 'E-Sports') { 🎮 }
+              @else if (nextRound()!.sport === 'Table Tennis') { 🏓 }
+              @else { 🎲 }
+            </div>
+            <div class="ck-next-round__event">
+              {{ nextRound()!.special_event ?? nextRound()!.sport ?? 'TBA' }}
+            </div>
+          } @else {
+            <div class="ck-next-round__num">——</div>
+            <div class="ck-next-round__event">SEASON COMPLETE</div>
+          }
+
+          <div class="ck-next-round__footer">
+            <span class="insert-coin">★ INSERT COIN ★</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════ FULL STANDINGS ═══ -->
+  @if (view() === 'standings') {
+    <div class="view-panel arcade-card glow-cyan">
       <div class="arcade-card-inner">
-
-        <div class="ck-standings__header">
+        <div class="section-head">
           <span class="pixel-title">HIGH SCORES</span>
-          <span class="ck-season-tag">SEASON 2026</span>
+          <span class="ck-season-tag">NET · WIN%</span>
         </div>
 
         @if (players().length === 0) {
-          <div class="ck-empty">
-            <span class="pixel-label blink">▶ NO PLAYERS YET</span>
-          </div>
+          <div class="ck-empty"><span class="pixel-label blink">▶ NO PLAYERS YET</span></div>
         } @else {
           <div class="scores-list">
             @for (p of players(); track p.user_id; let i = $index) {
               <div class="score-row"
                    [class.score-row--leader]="p.rank === 1"
                    [class.score-row--danger]="p.rank === players().length && (p.total_net ?? 0) < 0"
-                   [style.animation-delay]="(i * 80) + 'ms'">
+                   [style.animation-delay]="(i * 60) + 'ms'">
                 <span class="score-rank" [attr.data-color]="rankColor(p.rank)">{{ rankLabel(p.rank) }}</span>
                 <span class="score-name">{{ p.name }}</span>
                 <span class="score-streak">
@@ -99,64 +166,148 @@
               </div>
             }
           </div>
-
-          <div class="ck-standings__footer">
-            <span class="pixel-label">▶ {{ completedRoundCount() }} ROUNDS PLAYED</span>
-          </div>
         }
-
       </div>
     </div>
+  }
 
-    <!-- ╔══════════════════════════╗ -->
-    <!-- ║  PANEL B: NEXT ROUND    ║ -->
-    <!-- ╚══════════════════════════╝ -->
-    <div class="ck-panel ck-next-round arcade-card glow-pink">
+  <!-- ═══════════════════════════════════════════════════════ FORM GUIDE ═══ -->
+  @if (view() === 'form') {
+    <div class="view-panel arcade-card">
       <div class="arcade-card-inner">
-        <div class="ck-next-round__header">
-          <span class="pixel-label">INCOMING</span>
-          @if (nextRound() && nextRound()!.bonus_pct > 100) {
-            <span class="ck-bonus-badge">⚡ BONUS ×{{ (nextRound()!.bonus_pct / 100).toFixed(1) }}</span>
+        <div class="section-head">
+          <span class="pixel-title">FORM GUIDE</span>
+          <span class="ck-season-tag">LAST 5 ROUNDS</span>
+        </div>
+
+        @if (players().length === 0 || completedRoundCount() === 0) {
+          <div class="ck-empty"><span class="pixel-label">· NO DATA YET ·</span></div>
+        } @else {
+          <div class="ck-form__rows">
+            @for (p of players(); track p.user_id) {
+              <div class="ck-form__row">
+                <span class="ck-form__name">{{ p.name }}</span>
+                <div class="ck-form__bars">
+                  @for (gross of lastRounds(p.user_id, 5); track $index) {
+                    <span class="ck-bar {{ roundBarClass(gross) }}"
+                          [title]="gross !== null ? (gross > 0 ? '+' + num(gross) : num(gross)) : '—'">
+                      {{ roundBarLabel(gross) }}
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ════════════════════════════════════════════════════════ HEAT MAP ═══ -->
+  @if (view() === 'heatmap') {
+    <div class="view-panel arcade-card">
+      <div class="arcade-card-inner ck-heatmap__inner">
+        <div class="section-head">
+          <span class="pixel-title">ROUND HEAT MAP</span>
+          <span class="ck-heatmap__legend">
+            <span class="hm-key hm-key--win">W</span>
+            <span class="hm-key hm-key--loss">L</span>
+            <span class="hm-key hm-key--null">·</span>
+          </span>
+        </div>
+
+        @if (heatMap().rounds.length === 0) {
+          <div class="ck-empty"><span class="pixel-label">· NO DATA YET ·</span></div>
+        } @else {
+          <div class="hm-grid">
+            <div class="hm-row hm-row--header">
+              <span class="hm-name-col"></span>
+              @for (rn of heatMap().rounds; track rn) {
+                <span class="hm-rn">{{ rn }}</span>
+              }
+            </div>
+            @for (row of heatMap().rows; track row.name) {
+              <div class="hm-row">
+                <span class="hm-name-col">{{ row.name }}</span>
+                @for (gross of row.cells; track $index) {
+                  <span class="hm-cell"
+                        [class.hm-cell--win]="gross !== null && gross > 0"
+                        [class.hm-cell--loss]="gross !== null && gross <= 0"
+                        [class.hm-cell--null]="gross === null"
+                        [title]="gross !== null ? (gross > 0 ? '+' + num(gross) : num(gross)) : '—'">
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ═════════════════════════════════════════════════════════ RECORDS ═══ -->
+  @if (view() === 'records') {
+    <div class="ck-pods">
+      <div class="ck-pod arcade-card">
+        <div class="arcade-card-inner ck-pod__inner">
+          <span class="pixel-label">BEST ROUND</span>
+          @if (bestRound()) {
+            <span class="ck-pod__val" style="color: var(--color-win)">+{{ num(bestRound()!.gross) }}</span>
+            <span class="ck-pod__sub">RD{{ bestRound()!.round }} · {{ bestRound()!.name }}</span>
+          } @else {
+            <span class="ck-pod__val ck-pod__val--null">—</span>
+            <span class="ck-pod__sub">NO DATA YET</span>
           }
         </div>
+      </div>
 
-        @if (nextRound()) {
-          <div class="ck-next-round__num">
-            ROUND {{ nextRound()!.round_number < 10 ? '0' + nextRound()!.round_number : nextRound()!.round_number }}
-          </div>
-          <div class="ck-next-round__date">{{ formatDate(nextRound()!.round_date) }}</div>
-          <div class="ck-next-round__sport-icon">
-            @if (nextRound()!.sport === 'Races') { 🏇 }
-            @else if (nextRound()!.sport === 'Golf') { ⛳ }
-            @else if (nextRound()!.sport === 'NRL') { 🏉 }
-            @else if (nextRound()!.sport === 'Soccer') { ⚽ }
-            @else if (nextRound()!.sport === 'Cycling') { 🚴 }
-            @else if (nextRound()!.sport === 'E-Sports') { 🎮 }
-            @else if (nextRound()!.sport === 'Table Tennis') { 🏓 }
-            @else { 🎲 }
-          </div>
-          <div class="ck-next-round__event">
-            {{ nextRound()!.special_event ?? nextRound()!.sport ?? 'TBA' }}
-          </div>
-        } @else {
-          <div class="ck-next-round__num">——</div>
-          <div class="ck-next-round__event">SEASON COMPLETE</div>
-        }
+      <div class="ck-pod arcade-card">
+        <div class="arcade-card-inner ck-pod__inner">
+          <span class="pixel-label">WORST ROUND</span>
+          @if (worstRound()) {
+            <span class="ck-pod__val" style="color: var(--color-loss)">{{ num(worstRound()!.gross) }}</span>
+            <span class="ck-pod__sub">RD{{ worstRound()!.round }} · {{ worstRound()!.name }}</span>
+          } @else {
+            <span class="ck-pod__val ck-pod__val--null">—</span>
+            <span class="ck-pod__sub">NO DATA YET</span>
+          }
+        </div>
+      </div>
 
-        <div class="ck-next-round__footer">
-          <span class="insert-coin">★ INSERT COIN ★</span>
+      <div class="ck-pod arcade-card">
+        <div class="arcade-card-inner ck-pod__inner">
+          <span class="pixel-label">MOST WINS</span>
+          @if (mostWins()) {
+            <span class="ck-pod__val ck-pod__val--name" style="color: var(--color-cyan)">{{ mostWins()!.name }}</span>
+            <span class="ck-pod__sub">{{ mostWins()!.count }} ROUND WINS</span>
+          } @else {
+            <span class="ck-pod__val ck-pod__val--null">—</span>
+            <span class="ck-pod__sub">NO DATA YET</span>
+          }
+        </div>
+      </div>
+
+      <div class="ck-pod arcade-card">
+        <div class="arcade-card-inner ck-pod__inner">
+          <span class="pixel-label">HOT STREAK</span>
+          @if (topStreak()) {
+            <span class="ck-pod__val ck-pod__val--name" style="color: var(--color-gold)">{{ topStreak()!.name }}</span>
+            <span class="ck-pod__sub">{{ topStreak()!.streak }} IN A ROW 🔥</span>
+          } @else {
+            <span class="ck-pod__val ck-pod__val--null">—</span>
+            <span class="ck-pod__sub">NO STREAK</span>
+          }
         </div>
       </div>
     </div>
+  }
 
-    <!-- ╔══════════════════════════╗ -->
-    <!-- ║   PANEL C: SEASON ARC   ║ -->
-    <!-- ╚══════════════════════════╝ -->
-    <div class="ck-panel ck-season arcade-card glow-green">
+  <!-- ═══════════════════════════════════════════════════ SEASON PROGRESS ═══ -->
+  @if (view() === 'season') {
+    <div class="view-panel ck-season arcade-card glow-green">
       <div class="arcade-card-inner">
-
         <div class="ck-season__header">
-          <span class="pixel-label">SEASON ARC</span>
+          <span class="pixel-title">SEASON ARC</span>
           <span class="ck-season__pct">{{ seasonPct() }}%</span>
         </div>
 
@@ -186,242 +337,9 @@
             <span class="ck-mini-stat__val ck-mini-stat__val--gold">{{ players()[0]?.name ?? '—' }}</span>
           </div>
         </div>
-
       </div>
     </div>
-
-    <!-- ╔══════════════════════════╗ -->
-    <!-- ║  PANEL D: FORM GUIDE    ║ -->
-    <!-- ╚══════════════════════════╝ -->
-    <div class="ck-panel ck-form arcade-card">
-      <div class="arcade-card-inner">
-
-        <div class="ck-form__header">
-          <span class="pixel-label">FORM GUIDE</span>
-          <span class="ck-form__sub pixel-label">LAST 5 RDS</span>
-        </div>
-
-        @if (players().length === 0 || completedRoundCount() === 0) {
-          <div class="ck-empty">
-            <span class="pixel-label">· NO DATA YET ·</span>
-          </div>
-        } @else {
-          <div class="ck-form__rows">
-            @for (p of players(); track p.user_id) {
-              <div class="ck-form__row">
-                <span class="ck-form__name">{{ p.name }}</span>
-                <div class="ck-form__bars">
-                  @for (gross of lastRounds(p.user_id, 5); track $index) {
-                    <span class="ck-bar {{ roundBarClass(gross) }}"
-                          [title]="gross !== null ? (gross > 0 ? '+' + gross : '' + gross) : '—'">
-                      {{ roundBarLabel(gross) }}
-                    </span>
-                  }
-                </div>
-              </div>
-            }
-          </div>
-        }
-
-      </div>
-    </div>
-
-    <!-- ╔══════════════════════════╗ -->
-    <!-- ║   PANEL E: DANGER ZONE  ║ -->
-    <!-- ╚══════════════════════════╝ -->
-    <div class="ck-panel ck-danger arcade-card">
-      <div class="arcade-card-inner">
-
-        <div class="ck-danger__header">
-          <span class="pixel-label blink">⚠ DANGER ZONE</span>
-        </div>
-
-        @if (dangerPlayers().length === 0) {
-          <div class="ck-empty">
-            <span class="pixel-label">· NO DATA ·</span>
-          </div>
-        } @else {
-          <div class="ck-danger__players">
-            @for (p of dangerPlayers(); track p.user_id) {
-              <div class="ck-danger__player" [class.ck-danger__player--last]="p.rank === players().length">
-                <span class="ck-danger__rank pixel-label" [attr.data-color]="rankColor(p.rank)">{{ rankLabel(p.rank) }}</span>
-                <span class="ck-danger__name">{{ p.name }}</span>
-                <span class="ck-danger__net"
-                      [class.score-net--pos]="(p.total_net ?? 0) > 0"
-                      [class.score-net--neg]="(p.total_net ?? 0) < 0"
-                      [class.score-net--null]="p.total_net === null">
-                  {{ formatNet(p.total_net) }}
-                </span>
-              </div>
-            }
-          </div>
-
-          @if (p2Gap() !== null) {
-            <div class="ck-danger__gap-row">
-              <span class="pixel-label">GAP P1 → P2</span>
-              <span class="ck-danger__gap-val">{{ p2Gap() }} PTS</span>
-            </div>
-          }
-        }
-
-      </div>
-    </div>
-
-  </div><!-- /ck-grid -->
-
-  <!-- ── STAT PODS ROW ──────────────────────────────────────────────────────── -->
-  <div class="ck-pods">
-
-    <div class="ck-pod arcade-card">
-      <div class="arcade-card-inner ck-pod__inner">
-        <span class="pixel-label">WIN RATE</span>
-        <span class="ck-pod__val"
-              [class.ck-pod__val--null]="groupWinRate() === null"
-              [style.color]="groupWinRate() !== null ? 'var(--color-win)' : ''">
-          {{ groupWinRate() !== null ? groupWinRate() + '%' : '—' }}
-        </span>
-        <span class="ck-pod__sub">GROUP AVG</span>
-      </div>
-    </div>
-
-    <div class="ck-pod arcade-card">
-      <div class="arcade-card-inner ck-pod__inner">
-        <span class="pixel-label">P1 → P2 GAP</span>
-        <span class="ck-pod__val"
-              [class.ck-pod__val--null]="p2Gap() === null"
-              [style.color]="p2Gap() !== null ? 'var(--color-accent)' : ''">
-          {{ p2Gap() !== null ? p2Gap() + ' PTS' : '—' }}
-        </span>
-        <span class="ck-pod__sub">POINTS DEFICIT</span>
-      </div>
-    </div>
-
-    <div class="ck-pod arcade-card">
-      <div class="arcade-card-inner ck-pod__inner">
-        <span class="pixel-label">SEASON</span>
-        <span class="ck-pod__val" style="color: var(--color-cyan)">{{ seasonPct() }}%</span>
-        <span class="ck-pod__sub">{{ completedRoundCount() }} / {{ totalRounds }} ROUNDS</span>
-      </div>
-    </div>
-
-    <div class="ck-pod arcade-card">
-      <div class="arcade-card-inner ck-pod__inner">
-        <span class="pixel-label">LEADER</span>
-        <span class="ck-pod__val ck-pod__val--name" style="color: var(--color-gold)">
-          {{ players()[0]?.name ?? '—' }}
-        </span>
-        <span class="ck-pod__sub">{{ formatNet(players()[0]?.total_net ?? null) }} NET PTS</span>
-      </div>
-    </div>
-
-  </div><!-- /ck-pods -->
-
-  <!-- ── STAT PODS ROW 2 ────────────────────────────────────────────────────── -->
-  <div class="ck-pods ck-pods--row2">
-
-    <div class="ck-pod arcade-card">
-      <div class="arcade-card-inner ck-pod__inner">
-        <span class="pixel-label">BEST ROUND</span>
-        @if (bestRound()) {
-          <span class="ck-pod__val" style="color: var(--color-win)">
-            +{{ bestRound()!.gross }}
-          </span>
-          <span class="ck-pod__sub">RD{{ bestRound()!.round }} · {{ bestRound()!.name }}</span>
-        } @else {
-          <span class="ck-pod__val ck-pod__val--null">—</span>
-          <span class="ck-pod__sub">NO DATA YET</span>
-        }
-      </div>
-    </div>
-
-    <div class="ck-pod arcade-card">
-      <div class="arcade-card-inner ck-pod__inner">
-        <span class="pixel-label">WORST ROUND</span>
-        @if (worstRound()) {
-          <span class="ck-pod__val" style="color: var(--color-loss)">
-            {{ worstRound()!.gross }}
-          </span>
-          <span class="ck-pod__sub">RD{{ worstRound()!.round }} · {{ worstRound()!.name }}</span>
-        } @else {
-          <span class="ck-pod__val ck-pod__val--null">—</span>
-          <span class="ck-pod__sub">NO DATA YET</span>
-        }
-      </div>
-    </div>
-
-    <div class="ck-pod arcade-card">
-      <div class="arcade-card-inner ck-pod__inner">
-        <span class="pixel-label">MOST WINS</span>
-        @if (mostWins()) {
-          <span class="ck-pod__val ck-pod__val--name" style="color: var(--color-cyan)">
-            {{ mostWins()!.name }}
-          </span>
-          <span class="ck-pod__sub">{{ mostWins()!.count }} ROUND WINS</span>
-        } @else {
-          <span class="ck-pod__val ck-pod__val--null">—</span>
-          <span class="ck-pod__sub">NO DATA YET</span>
-        }
-      </div>
-    </div>
-
-    <div class="ck-pod arcade-card">
-      <div class="arcade-card-inner ck-pod__inner">
-        <span class="pixel-label">HOT STREAK</span>
-        @if (topStreak()) {
-          <span class="ck-pod__val ck-pod__val--name" style="color: var(--color-gold)">
-            {{ topStreak()!.name }}
-          </span>
-          <span class="ck-pod__sub">{{ topStreak()!.streak }} IN A ROW 🔥</span>
-        } @else {
-          <span class="ck-pod__val ck-pod__val--null">—</span>
-          <span class="ck-pod__sub">NO STREAK</span>
-        }
-      </div>
-    </div>
-
-  </div><!-- /ck-pods--row2 -->
-
-  <!-- ── HEAT MAP ────────────────────────────────────────────────────────────── -->
-  @if (heatMap().rounds.length > 0) {
-  <div class="ck-heatmap arcade-card">
-    <div class="arcade-card-inner ck-heatmap__inner">
-
-      <div class="ck-heatmap__header">
-        <span class="pixel-label">ROUND HEAT MAP</span>
-        <span class="ck-heatmap__legend">
-          <span class="hm-key hm-key--win">W</span>
-          <span class="hm-key hm-key--loss">L</span>
-          <span class="hm-key hm-key--null">·</span>
-        </span>
-      </div>
-
-      <div class="hm-grid">
-        <!-- Header row: round numbers -->
-        <div class="hm-row hm-row--header">
-          <span class="hm-name-col"></span>
-          @for (rn of heatMap().rounds; track rn) {
-            <span class="hm-rn">{{ rn }}</span>
-          }
-        </div>
-        <!-- Player rows -->
-        @for (row of heatMap().rows; track row.name) {
-          <div class="hm-row">
-            <span class="hm-name-col">{{ row.name }}</span>
-            @for (gross of row.cells; track $index) {
-              <span class="hm-cell"
-                    [class.hm-cell--win]="gross !== null && gross > 0"
-                    [class.hm-cell--loss]="gross !== null && gross <= 0"
-                    [class.hm-cell--null]="gross === null"
-                    [title]="gross !== null ? (gross > 0 ? '+' + gross : '' + gross) : '—'">
-              </span>
-            }
-          </div>
-        }
-      </div>
-
-    </div>
-  </div>
-  }<!-- /ck-heatmap -->
+  }
 
 </div>
 }

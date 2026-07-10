@@ -6,6 +6,7 @@
 //   implemented. Add animation-delay via @for $index to each .score-row.
 
 import { Component, OnInit, signal, computed } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../../core/supabase.service';
 import { LeaderboardEntry } from '../../shared/models/bet-result.model';
 import { Round, RoundScore } from '../../shared/models/round.model';
@@ -16,15 +17,65 @@ interface PlayerRow extends LeaderboardEntry {
   streakType: 'win' | 'loss';
 }
 
+export type DashView = 'overview' | 'standings' | 'form' | 'heatmap' | 'records' | 'season';
+
+interface Kpi {
+  label: string;
+  value: string;
+  tone: 'gold' | 'cyan' | 'green' | 'pink' | 'plain';
+}
+
 @Component({
   selector: 'app-leaderboard',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './leaderboard.html',
   styleUrl: './leaderboard.scss',
 })
 export class Leaderboard implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
+
+  // ─── View selector ────────────────────────────────────────────────────────────
+  private readonly VIEW_KEY = 'spc26_dash_view';
+  view = signal<DashView>(
+    (sessionStorage.getItem(this.VIEW_KEY) as DashView | null) ?? 'overview'
+  );
+  readonly views: { id: DashView; label: string }[] = [
+    { id: 'overview',  label: '◆ Overview' },
+    { id: 'standings', label: 'Full Standings' },
+    { id: 'form',      label: 'Form Guide' },
+    { id: 'heatmap',   label: 'Heat Map' },
+    { id: 'records',   label: 'Records' },
+    { id: 'season',    label: 'Season Progress' },
+  ];
+
+  setView(v: string) {
+    this.view.set(v as DashView);
+    sessionStorage.setItem(this.VIEW_KEY, v);
+  }
+
+  viewLabel(): string {
+    return this.views.find(v => v.id === this.view())?.label ?? '';
+  }
+
+  top3 = computed(() => this.players().slice(0, 3));
+
+  kpis = computed<Kpi[]>(() => {
+    const p = this.players();
+    const leader = p[0];
+    const gap = this.p2Gap();
+    const wr = this.groupWinRate();
+    return [
+      { label: 'LEADER',      value: leader?.name ?? '—', tone: 'gold' },
+      { label: 'LEADER NET',  value: this.formatNet(leader?.total_net ?? null), tone: (leader?.total_net ?? 0) >= 0 ? 'green' : 'pink' },
+      { label: 'PLAYERS',     value: String(p.length || '—'), tone: 'cyan' },
+      { label: 'ROUNDS',      value: `${this.completedRoundCount()}/${this.totalRounds}`, tone: 'plain' },
+      { label: 'SEASON',      value: `${this.seasonPct()}%`, tone: 'cyan' },
+      { label: 'WIN RATE',    value: wr !== null ? `${wr}%` : '—', tone: 'green' },
+      { label: 'P1→P2 GAP',   value: gap !== null ? `${this.num(gap)}` : '—', tone: 'pink' },
+      { label: 'ROUNDS LEFT', value: String(this.totalRounds - this.completedRoundCount()), tone: 'plain' },
+    ];
+  });
 
   players    = signal<PlayerRow[]>([]);
   nextRound  = signal<Round | null>(null);
@@ -57,7 +108,7 @@ export class Leaderboard implements OnInit {
   p2Gap = computed(() => {
     const p = this.players();
     if (p.length < 2 || p[0].total_net === null || p[1].total_net === null) return null;
-    return (p[0].total_net ?? 0) - (p[1].total_net ?? 0);
+    return Math.round(((p[0].total_net ?? 0) - (p[1].total_net ?? 0)) * 10) / 10;
   });
 
   dangerPlayers = computed(() => {
@@ -206,9 +257,15 @@ export class Leaderboard implements OnInit {
     return 'default';
   }
 
+  /** Format a number to at most 1 decimal place, trimming a trailing `.0`. */
+  num(n: number): string {
+    const r = Math.round(n * 10) / 10;
+    return Number.isInteger(r) ? String(r) : r.toFixed(1);
+  }
+
   formatNet(net: number | null): string {
     if (net === null) return '—';
-    return net >= 0 ? `+${net}` : `${net}`;
+    return net >= 0 ? `+${this.num(net)}` : this.num(net);
   }
 
   formatDate(dateStr: string): string {

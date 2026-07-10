@@ -93,86 +93,75 @@
   white-space: nowrap;
 }
 
-// ─── Step 1: Round Picker ──────────────────────────────────────────────────────
+// ─── Header Controls: round selector ────────────────────────────────────────────
 
-.round-picker {
-  border-color: rgba(0, 245, 255, 0.3);
-
-  .arcade-card-inner {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  &__title {
-    color: var(--color-cyan);
-    text-shadow: 0 0 8px rgba(0, 245, 255, 0.4);
-  }
-}
-
-.round-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 10px;
-
-  @media (max-width: 480px) { grid-template-columns: repeat(2, 1fr); }
-}
-
-.round-card {
-  background: var(--color-card-2);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 14px 12px;
-  cursor: pointer;
+.header-controls {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: left;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-  position: relative;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
-  &:hover {
-    background: rgba(0, 245, 255, 0.06);
-    border-color: var(--color-cyan);
-    box-shadow: 0 0 12px rgba(0, 245, 255, 0.2);
+.round-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.round-select {
+  background: var(--color-bg);
+  border: 1px solid var(--color-cyan);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text);
+  outline: none;
+  cursor: pointer;
+  max-width: 100%;
+  transition: box-shadow 0.15s ease;
+
+  &:focus { box-shadow: 0 0 8px rgba(0, 245, 255, 0.3); }
+
+  option { background: var(--color-card); color: var(--color-text); }
+}
+
+// ─── Unlock banner ──────────────────────────────────────────────────────────────
+
+.lock-banner {
+  border-color: rgba(255, 215, 0, 0.3);
+
+  &__inner {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
   }
 
-  &__num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    line-height: 1;
-    color: var(--color-accent);
-    text-shadow: 0 0 12px rgba(255, 0, 168, 0.4);
-    letter-spacing: 0.05em;
-  }
-
-  &__date {
+  &__text {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--color-muted);
-    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    color: rgba(255, 215, 0, 0.85);
+    letter-spacing: 0.02em;
   }
 
-  &__sport {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1rem;
-    color: var(--color-text);
-    letter-spacing: 0.06em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &__bonus {
+  &__btn {
     font-family: 'Press Start 2P', monospace;
-    font-size: 0.45rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.06em;
+    padding: 9px 18px;
     color: var(--color-gold);
-    letter-spacing: 0.05em;
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    text-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+    border-color: rgba(255, 215, 0, 0.4);
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(255, 215, 0, 0.08);
+      border-color: var(--color-gold);
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+    }
   }
 }
 
@@ -238,7 +227,7 @@
     text-align: right;
   }
 
-  appearance: textfield;
+  & { appearance: textfield; }
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 }
@@ -394,7 +383,7 @@
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 
   // Hide browser number spinners
-  appearance: textfield;
+  & { appearance: textfield; }
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 }

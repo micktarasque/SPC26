@@ -88,10 +88,12 @@
     <!-- Header -->
     <div class="wheel-header">
       <div>
-        <span class="pixel-label">ADMIN &middot; &#128274;</span>
+        <span class="pixel-label">SPC26 &middot; SEASON 2026</span>
         <h1 class="wheel-title">WHEEL SPINNER</h1>
       </div>
-      <button class="btn-ghost edit-sports-btn" (click)="openEdit()">&#9881; EDIT SPORTS</button>
+      <button class="btn-ghost edit-sports-btn" (click)="openEdit()">
+        @if (!lock.unlocked()) { &#128274; } &#9881; EDIT SPORTS
+      </button>
     </div>
 
     <!-- Body: wheel + controls -->
@@ -188,7 +190,7 @@
                 (click)="saveToRound()">
                 @if (savingRound()) { SAVING... }
                 @else if (roundSaved()) { &#x2713; SAVED TO R{{ targetRound()?.round_number }} }
-                @else { &#128190; SAVE TO ROUND }
+                @else { @if (!lock.unlocked()) { &#128274; } &#128190; SAVE TO ROUND }
               </button>
               <button class="btn-ghost result-btn result-btn--share" (click)="tryShare()">
                 &#128247; SHARE
